@@ -3,6 +3,7 @@
 """
 import pandas as pd
 from tkinter import messagebox
+import re
 from pytrovich.detector import PetrovichGenderDetector
 from pytrovich.enums import NamePart, Gender, Case
 from pytrovich.maker import PetrovichDeclinationMaker
@@ -131,6 +132,21 @@ def create_initials(cell, checkbox, space):
     else:
         return cell
 
+def split_fio(value:str,number):
+    """
+    Функция для разделения данных в колонке ФИО на колонки
+    :param value:значение ФИО
+    :param number: порядковый номер значения- 0 Фамилия, 1 Имя, 2 Отчество
+    :return:
+    """
+    lst_fio = value.split(' ')
+    if len(lst_fio) == 3:
+        return lst_fio[number]
+    else:
+        return 'Проверьте количество слов, должно быть 3 разделенных пробелами слова'
+
+
+
 def declension_fio_by_case(df:pd.DataFrame)->pd.DataFrame:
     """
     Функция для склоения фио по падежам , создания инициалов
@@ -143,12 +159,23 @@ def declension_fio_by_case(df:pd.DataFrame)->pd.DataFrame:
         # проверяем наличие колонки ФИО
         if 'ФИО' in df.columns:
             fio_column = 'ФИО'
+            df['ФИО'] = df['ФИО'].apply(lambda x:x.strip() if isinstance(x,str) else 'Не заполнено')
+            df['ФИО'] = df['ФИО'].apply(lambda x:re.sub(r'\s+',' ',x))
+            # Создаем колонки Фамилия,Имя, Отчество
+            df['Фамилия'] = df['ФИО'].apply(lambda x:split_fio(x,0))
+            df['Имя'] = df['ФИО'].apply(lambda x:split_fio(x,1))
+            df['Отчество'] = df['ФИО'].apply(lambda x:split_fio(x,2))
+
         else:
             # проверяем наличие колонок
             check_fio_columns = {'Фамилия','Имя','Отчество'}
             diff_cols = check_fio_columns.difference(df.columns)
             if len(diff_cols) != 0:
                 raise NotFIOPart
+            # Очищаем от пробелов в начале и конце
+            df['Фамилия'] = df['Фамилия'].apply(lambda x:x.strip() if isinstance(x,str) else 'Не заполнено')
+            df['Имя'] = df['Имя'].apply(lambda x:x.strip() if isinstance(x,str) else 'Не заполнено')
+            df['Отчество'] = df['Отчество'].apply(lambda x:x.strip() if isinstance(x,str) else 'Не заполнено')
             df['ФИО'] = df['Фамилия'] + ' ' + df['Имя'] + ' '+ df['Отчество']
             fio_column = 'ФИО'
 
@@ -295,6 +322,7 @@ def declension_fio_by_case(df:pd.DataFrame)->pd.DataFrame:
 
 if __name__ == '__main__':
     data_decl_case_main = 'data\Таблица для заполнения бланков.xlsx'
+    # data_decl_case_main = 'data\с ФИО.xlsx'
     path_to_end_folder_decl_case_main = 'data/Результат'
     main_df = pd.read_excel(data_decl_case_main,sheet_name='Данные',dtype=str)
 

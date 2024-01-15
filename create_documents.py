@@ -10,6 +10,14 @@ import openpyxl
 from tkinter import messagebox
 import os
 from datetime import datetime
+import re
+import warnings
+warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
+warnings.simplefilter(action='ignore', category=DeprecationWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+pd.options.mode.chained_assignment = None
+
 
 class NotNameColumn(Exception):
     """
@@ -29,7 +37,28 @@ def create_docs(data_file:str,folder_template:str,result_folder:str,type_program
     """
     try:
         # Предобработка датафрейма с данными курса
-        descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str)  # получаем данные
+        descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
+        # Проверяем наличие колонок
+        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация','Дата_начало','Дата_конец','Объем',
+                           'ФИО_руководитель','Должность_руководитель','Основание_родит_падеж','ФИО_секретарь','База'}
+        diff_cols = desc_check_cols.difference(set(descr_df.columns))
+        if len(diff_cols) != 0:
+            raise NotNameColumn
+        descr_df = descr_df.applymap(lambda x:re.sub(r'\s+',' ',x) if isinstance(x,str) else x) # очищаем от лишних пробелов
+        descr_df = descr_df.applymap(lambda x:x.strip() if isinstance(x,str) else x) # очищаем от пробелов в начале и конце
+
+        # Создаем единичные переменные
+        name_program = descr_df.loc[0,'Наименование_программы']
+        type_course  = descr_df.loc[0,'Тип_программы']
+        name_qval = descr_df.loc[0,'Квалификация']
+        date_begin = descr_df.loc[0,'Дата_начало']
+        date_end = descr_df.loc[0,'Дата_конец']
+        volume = descr_df.loc[0,'Объем']
+        fio_chief = descr_df.loc[0,'ФИО_руководитель']
+        chief_position = descr_df.loc[0,'Должность_руководитель']
+        name_doc_rod_case = descr_df.loc[0,'Основание_родит_падеж']
+        fio_secretary = descr_df.loc[0,'ФИО_секретарь']
+        base = descr_df.loc[0,'База']
 
         # Предобработка датафрейма с данными слушателей
         data_df = pd.read_excel(data_file, sheet_name='Данные', dtype=str)  # получаем данные
@@ -46,6 +75,9 @@ def create_docs(data_file:str,folder_template:str,result_folder:str,type_program
             """
         data_df['Дата_рождения'] = data_df['Дата_рождения'].apply(convert_date_yandex)
         data_df['Дата_выдачи_паспорта'] = data_df['Дата_выдачи_паспорта'].apply(convert_date_yandex)
+
+        # Создаем файл ФИС-ФРДО
+        create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,data_file)
 
 
 

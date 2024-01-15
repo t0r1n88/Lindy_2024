@@ -46,23 +46,26 @@ def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_
 
 
 
-def create_fis_frdo(data_file:str,folder_template:str,result_folder:str,type_program:str):
+def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,result_folder:str,type_program:str,name_file:str):
     """
     Функция для создания файлов ФИС ФРДО
-    :param data_file: файл с данными
+    :param df: датафрейм с данными
+    :param descr_df: датафрейм с описанием курса
     :param result_folder: путь к конечной папке
     :param folder_template:путь к папке с шаблонами
     :param type_program: тип создаваемого файла - ПК или ПО
+    :param name_file: имя файла
     :return:файл Excel
     """
     try:
         if type_program == 'ДПО':
-            df = pd.read_excel(data_file,sheet_name='Данные', dtype=str) # получаем данные
-            df['Дата_рождения'] = df['Дата_рождения'].apply(convert_date_yandex)
 
             dct_df = df.to_dict(orient='list') # превращаем в словарь где ключ это название колонки а значение это список
             # Создаем словарь для хранения номеров колонок для каждого названия
-            dct_number_column = {'Номер_удостоверения':7,'Рег_номер':9,'Фамилия':22,
+            dct_number_column = {'Номер_удостоверения':7,'Рег_номер':9,'Наименование_программы':11,'Квалификация':14,
+                                 'Уровень_образования':15,'Фамилия_диплом':16,'Серия_диплом':17,'Номер_диплом':18,
+                                 'Дата_начало':19,'Дата_конец':20,'Объем':21,
+                                 'Фамилия':22,
                                  'Имя':23,'Отчество':24,
                                  'Дата_рождения':25,'Пол':26,'СНИЛС':27}
             # проверяем наличие соответствующих колонок
@@ -73,6 +76,17 @@ def create_fis_frdo(data_file:str,folder_template:str,result_folder:str,type_pro
             template_fis_frdo_dpo = openpyxl.load_workbook(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx')
             fis_frdo_dpo = write_data_fis_frdo(template_fis_frdo_dpo,dct_df,dct_number_column) # Записываем в шаблон
             fis_frdo_dpo.save(f'{result_folder}/ФИС-ФРДО ДПО.xlsx')
+        elif type_program == 'ПО':
+            print('PO сделать создание года, разряд')
+            dct_df = df.to_dict(
+                orient='list')  # превращаем в словарь где ключ это название колонки а значение это список
+            dct_number_column = {'Номер_удостоверения':7,'Рег_номер':9,'Фамилия':22,
+                                 'Имя':23,'Отчество':24,
+                                 'Дата_рождения':25,'Пол':26,'СНИЛС':27}
+
+
+        else:
+            messagebox.showerror('Создание документов ДПО,ПО','На листе Описание в колонке Тип_программы должен быть выбран тип программы ДПО или ПО')
 
 
     except FileNotFoundError:
@@ -82,7 +96,9 @@ def create_fis_frdo(data_file:str,folder_template:str,result_folder:str,type_pro
 
     except NotNameColumn:
         messagebox.showerror('Создание документов ДПО,ПО',
-                             f'В файле {data_file} не найдены следующие колонки {diff_cols}')
+                             f'В файле {name_file} не найдены следующие колонки {diff_cols}')
+
+
 
 
 
