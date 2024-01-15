@@ -7,7 +7,7 @@ import pandas as pd
 import openpyxl
 from tkinter import messagebox
 import os
-from datetime import datetime
+import time
 import warnings
 warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
@@ -34,7 +34,7 @@ class NotNameColumn(Exception):
     """
     pass
 
-def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_number_column:dict,dct_descr_number:dict,dct_descr_df:dict,type_program:str)->openpyxl.Workbook:
+def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_number_column:dict,dct_descr_number:dict,dct_descr_df:dict)->openpyxl.Workbook:
     """
     Функция для записи данных в шаблон ФИС -ФРДО
     :param template_fis_frdo_dpo: шаблон ФИС-ФРДО
@@ -64,24 +64,33 @@ def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_
 
     dct_descr_df['Дата_начало'][0] = date_begin
     dct_descr_df['Дата_конец'][0] = date_end
+    # Делаем числовым срок обучения
+    temp_volume =dct_descr_df['Объем'][0]
+    if temp_volume.isdigit():
+        dct_descr_df['Объем'][0] = int(temp_volume)
+    else:
+        dct_descr_df['Объем'][0] = 'Некорректное значение. Должно быть указано целое число'
 
 
-    if type_program == 'ДПО':
-        for name_column,number_col in dct_number_column.items():
-            # перебираем словарь с порядковыми номерами колонок
-            start_row = 2  # строка с которой будет начинаться записи
-            for value in dct_df[name_column]: # записываем данные из словаря с данными
-                template_fis_frdo_dpo['Шаблон'].cell(row=start_row, column=number_col, value=value)
-                start_row += 1
 
 
-        # пха тройный цикл ну да ладно
-        for name_column,number_col in dct_descr_number.items():
-            for value in dct_descr_df[name_column]:
-                for row in range(2,count_row+2): # записываем данные из словаря с данными
-                    template_fis_frdo_dpo['Шаблон'].cell(row=row, column=number_col, value=value)
 
-        return template_fis_frdo_dpo
+
+    for name_column,number_col in dct_number_column.items():
+        # перебираем словарь с порядковыми номерами колонок
+        start_row = 2  # строка с которой будет начинаться записи
+        for value in dct_df[name_column]: # записываем данные из словаря с данными
+            template_fis_frdo_dpo['Шаблон'].cell(row=start_row, column=number_col, value=value)
+            start_row += 1
+
+
+    # пха тройный цикл ну да ладно
+    for name_column,number_col in dct_descr_number.items():
+        for value in dct_descr_df[name_column]:
+            for row in range(2,count_row+2): # записываем данные из словаря с данными
+                template_fis_frdo_dpo['Шаблон'].cell(row=row, column=number_col, value=value)
+
+    return template_fis_frdo_dpo
 
 
 
@@ -96,6 +105,9 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
     :param name_file: имя файла
     :return:файл Excel
     """
+    # генерируем текущее время
+    t = time.localtime()
+    current_time = time.strftime('%H_%M_%S', t)
     try:
         if type_program == 'ДПО':
 
@@ -107,21 +119,77 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
                                  'Имя':23,'Отчество':24,
                                  'Дата_рождения':25,'Пол':26,'СНИЛС':27}
 
-            dct_descr_number = {'Наименование_программы':11,'Квалификация':14,
+            dct_descr_number = {'Тип_программы':10,'Наименование_программы':11,'Квалификация_профессия_специальность':14,
                                  'Дата_начало':19,'Дата_конец':20,'Объем':21}
 
 
 
             template_fis_frdo_dpo = openpyxl.load_workbook(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx')
-            fis_frdo_dpo = write_data_fis_frdo(template_fis_frdo_dpo,dct_df,dct_number_column,dct_descr_number,dct_descr_df,type_program) # Записываем в шаблон
-            fis_frdo_dpo.save(f'{result_folder}/ФИС-ФРДО ДПО.xlsx')
+            fis_frdo_dpo = write_data_fis_frdo(template_fis_frdo_dpo,dct_df,dct_number_column,dct_descr_number,dct_descr_df) # Записываем в шаблон
+            # делаем колонки по ширине содержимого
+            for column in fis_frdo_dpo['Шаблон'].columns:
+                max_length = 0
+                column_name = get_column_letter(column[0].column)
+                for cell in column:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(cell.value)
+                    except:
+                        pass
+                adjusted_width = (max_length + 2)
+                fis_frdo_dpo['Шаблон'].column_dimensions[column_name].width = adjusted_width
+                # Изменяем у некоторых колонок ширину
+                fis_frdo_dpo['Шаблон'].column_dimensions['J'].width = 50
+                fis_frdo_dpo['Шаблон'].column_dimensions['S'].width = 20
+                fis_frdo_dpo['Шаблон'].column_dimensions['T'].width = 20
+                fis_frdo_dpo['Шаблон'].column_dimensions['U'].width = 20
+                fis_frdo_dpo['Шаблон'].column_dimensions['AD'].width = 30
+                fis_frdo_dpo['Шаблон'].column_dimensions['AE'].width = 20
+
+
+            fis_frdo_dpo.save(f'{result_folder}/ФИС-ФРДО ДПО {current_time}.xlsx')
         elif type_program == 'ПО':
-            print('PO сделать создание года, разряд')
             dct_df = df.to_dict(
                 orient='list')  # превращаем в словарь где ключ это название колонки а значение это список
-            dct_number_column = {'Номер_удостоверения':7,'Рег_номер':9,'Фамилия':22,
-                                 'Имя':23,'Отчество':24,
-                                 'Дата_рождения':25,'Пол':26,'СНИЛС':27}
+            dct_descr_df = descr_df.to_dict(orient='list')
+            # Создаем словарь для хранения номеров колонок для каждого названия
+            dct_number_column = {'Номер_удостоверения':7,'Рег_номер':9,
+                                 'Фамилия':17,
+                                 'Имя':18,'Отчество':19,
+                                 'Дата_рождения':20,'Пол':21,'СНИЛС':22}
+
+            dct_descr_number = {'Тип_программы':10,'Наименование_программы':11,'Квалификация_профессия_специальность':12,'Категория':13,
+                                 'Дата_начало':14,'Дата_конец':15,'Объем':16}
+
+            template_fis_frdo_po = openpyxl.load_workbook(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ПО.xlsx')
+            fis_frdo_po = write_data_fis_frdo(template_fis_frdo_po, dct_df, dct_number_column, dct_descr_number,
+                                               dct_descr_df)  # Записываем в шаблон
+            # делаем колонки по ширине содержимого
+            for column in fis_frdo_po['Шаблон'].columns:
+                max_length = 0
+                column_name = get_column_letter(column[0].column)
+                for cell in column:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(cell.value)
+                    except:
+                        pass
+                adjusted_width = (max_length + 2)
+                fis_frdo_po['Шаблон'].column_dimensions[column_name].width = adjusted_width
+                # Изменяем у некоторых колонок ширину
+                fis_frdo_po['Шаблон'].column_dimensions['J'].width = 50
+                fis_frdo_po['Шаблон'].column_dimensions['K'].width = 50
+                fis_frdo_po['Шаблон'].column_dimensions['L'].width = 70
+                fis_frdo_po['Шаблон'].column_dimensions['M'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['S'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['T'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['U'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['W'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['Z'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['AD'].width = 30
+                fis_frdo_po['Шаблон'].column_dimensions['AE'].width = 20
+
+            fis_frdo_po.save(f'{result_folder}/ФИС-ФРДО ПО {current_time}.xlsx')
 
 
 

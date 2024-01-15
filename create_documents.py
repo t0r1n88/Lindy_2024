@@ -26,20 +26,19 @@ class NotNameColumn(Exception):
     pass
 
 
-def create_docs(data_file:str,folder_template:str,result_folder:str,type_program:str):
+def create_docs(data_file:str,folder_template:str,result_folder:str):
     """
     Скрипт для сопроводительной документации. Точка входа
     :param data_file: файл Excel с данными
     :param folder_template: папка с шаблонами
     :param result_folder: итоговая папка
-    :param type_program: тип программы ДПО или ПО
     :return: Документация в формате docx и файл ФИс-ФРДО
     """
     try:
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
         # Проверяем наличие колонок
-        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация','Дата_начало','Дата_конец','Объем',
+        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Категория','Дата_начало','Дата_конец','Объем',
                            'ФИО_руководитель','Должность_руководитель','Основание_родит_падеж','ФИО_секретарь','База'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
@@ -47,10 +46,19 @@ def create_docs(data_file:str,folder_template:str,result_folder:str,type_program
         descr_df = descr_df.applymap(lambda x:re.sub(r'\s+',' ',x) if isinstance(x,str) else x) # очищаем от лишних пробелов
         descr_df = descr_df.applymap(lambda x:x.strip() if isinstance(x,str) else x) # очищаем от пробелов в начале и конце
 
+        # Получаем тип программы ДПО или ПО
+        dpo_set = {'Повышение квалификации','Профессиональная переподготовка'}
+        if descr_df.loc[0,'Тип_программы'] in dpo_set:
+            type_program = 'ДПО'
+        else:
+            type_program = 'ПО'
+
+
         # Создаем единичные переменные
         name_program = descr_df.loc[0,'Наименование_программы']
         type_course  = descr_df.loc[0,'Тип_программы']
-        name_qval = descr_df.loc[0,'Квалификация']
+        name_qval = descr_df.loc[0,'Квалификация_профессия_специальность']
+        category = descr_df.loc[0,'Категория']
         date_begin = descr_df.loc[0,'Дата_начало']
         date_end = descr_df.loc[0,'Дата_конец']
         volume = descr_df.loc[0,'Объем']
@@ -102,7 +110,6 @@ if __name__ == '__main__':
     main_data_file = 'data/Таблица для заполнения бланков.xlsx'
     main_folder_template = 'data/Шаблоны'
     main_result_folder = 'data/Результат'
-    main_type_program = 'ДПО'
 
-    create_docs(main_data_file,main_folder_template,main_result_folder,main_type_program)
+    create_docs(main_data_file,main_folder_template,main_result_folder)
     print('Lindy Booth !!!')
