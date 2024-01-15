@@ -118,37 +118,14 @@ def prepare_date_column(df:pd.DataFrame,lst_columns:list)->pd.DataFrame:
     df[prepared_columns_lst] = df[prepared_columns_lst].applymap(create_doc_convert_date)  # приводим к виду ДД.ММ.ГГГГ
     return df
 
-def prepare_snils(df:pd.DataFrame,snils:str)->pd.DataFrame:
+def prepare_snils(df:pd.DataFrame)->pd.DataFrame:
     """
     Функция для обработки колонок со снилс
     df: датафрейм для обработки
-    snils: название снилс
     """
-
-    prepared_columns_lst = []  # список для колонок содержащих слово снилс
-    for name_column in df.columns:
-        if snils in name_column.lower():
-            prepared_columns_lst.append(name_column)
-
-    if len(prepared_columns_lst) == 0: # проверка на случай не найденных значений
-        return df
-
-    df[prepared_columns_lst] = df[prepared_columns_lst].applymap(check_snils)
+    df['СНИЛС'] = df['СНИЛС'].apply(check_snils)
 
     return df
-
-def prepare_snils_copp(df:pd.DataFrame,snils:str)->pd.DataFrame:
-    """
-    Функция для обработки колонок со снилс
-    df: датафрейм для обработки
-    snils: название снилс
-    """
-    if snils not in df.columns:
-        messagebox.showerror('','Не найдена колонка СНИЛС!!!')
-
-    df['СНИЛС'] =df['СНИЛС'].apply(check_snils)
-    return df
-
 
 
 def check_snils(snils):
@@ -355,8 +332,7 @@ def prepare_list(file_data:str,path_end_folder:str,checkbox_dupl:str):
         df = prepare_date_column(df,part_date_columns)
 
         # обрабатываем колонки со снилс
-        snils = 'снилс'
-        df = prepare_snils(df, snils)
+        df = prepare_snils(df)
 
         # обрабатываем колонки с ИНН
         part_inn_columns = ['инн']
@@ -376,35 +352,34 @@ def prepare_list(file_data:str,path_end_folder:str,checkbox_dupl:str):
         t = time.localtime()
         current_time = time.strftime('%H_%M_%S', t)
 
-        if checkbox_dupl == 'Yes':
-            """
-            Создаем список дубликатов
-            """
-            lst_name_columns = list(df.columns)  # получаем список колонок
-            used_name_sheet = []  # список для хранения значений которые уже были использованы
-            if len(lst_name_columns) >= 253:  # проверяем количество колонок которые могут созданы
-                raise ExceedingQuantity
-            #
-            wb = openpyxl.Workbook(write_only=True)  # создаем файл
-            for idx, value in enumerate(lst_name_columns):
-                temp_df = df[df[value].duplicated(keep=False)]  # получаем дубликаты
-                if temp_df.shape[0] == 0:
-                    continue
+        """
+        Создаем список дубликатов
+        """
+        lst_name_columns = list(df.columns)  # получаем список колонок
+        used_name_sheet = []  # список для хранения значений которые уже были использованы
+        if len(lst_name_columns) >= 253:  # проверяем количество колонок которые могут созданы
+            raise ExceedingQuantity
+        #
+        wb = openpyxl.Workbook(write_only=True)  # создаем файл
+        for idx, value in enumerate(lst_name_columns):
+            temp_df = df[df[value].duplicated(keep=False)]  # получаем дубликаты
+            if temp_df.shape[0] == 0:
+                continue
 
-                short_value = value[:20]  # получаем обрезанное значение
-                short_value = re.sub(r'[\r\b\n\t\[\]\'+()<> :"?*|\\/]', '_', short_value)
+            short_value = value[:20]  # получаем обрезанное значение
+            short_value = re.sub(r'[\r\b\n\t\[\]\'+()<> :"?*|\\/]', '_', short_value)
 
-                if short_value in used_name_sheet:
-                    short_value = f'{short_value}_{idx}'  # добавляем окончание
-                wb.create_sheet(short_value, index=idx)  # создаем лист
-                used_name_sheet.append(short_value)
+            if short_value in used_name_sheet:
+                short_value = f'{short_value}_{idx}'  # добавляем окончание
+            wb.create_sheet(short_value, index=idx)  # создаем лист
+            used_name_sheet.append(short_value)
 
-                temp_df = temp_df.sort_values(by=value)
-                #     # Добавляем +2 к индексу чтобы отобразить точную строку
-                temp_df.insert(0, '№ строки дубликата ', list(map(lambda x: x + 2, list(temp_df.index))))
+            temp_df = temp_df.sort_values(by=value)
+            #     # Добавляем +2 к индексу чтобы отобразить точную строку
+            temp_df.insert(0, '№ строки дубликата ', list(map(lambda x: x + 2, list(temp_df.index))))
 
-                for row in dataframe_to_rows(temp_df, index=False, header=True):
-                    wb[short_value].append(row)
+            for row in dataframe_to_rows(temp_df, index=False, header=True):
+                wb[short_value].append(row)
 
             wb.save(f'{path_end_folder}/Дубликаты в каждой колонке {current_time}.xlsx')
             # очищаем
