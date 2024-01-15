@@ -1,6 +1,8 @@
 """
 Модуль для создания файла ФИС ФРДО
 """
+from support_functions import * # вспомогательные функции
+
 import pandas as pd
 import openpyxl
 from tkinter import messagebox
@@ -24,18 +26,6 @@ class NotNameColumn(Exception):
     Исключение для обработки случая когда не совпадают названия колонок
     """
     pass
-
-def convert_date_yandex(value:str):
-    """
-    Функция для конвертации дат из яндекс файла
-    :param value: строка
-    :return:дата
-    """
-    date_object = datetime.strptime(value, "%Y-%m-%d") # делаем объект datetime
-    return date_object.strftime("%d.%m.%Y") # преобразуем в нужный формат
-
-
-
 
 def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_number_column:dict)->openpyxl.Workbook:
     """
