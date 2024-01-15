@@ -40,13 +40,24 @@ def create_docs(data_file:str,folder_template:str,result_folder:str,type_program
         if len(diff_cols) != 0:
             raise NotNameColumn  # если есть разница вызываем и обрабатываем исключение
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
-
-
+        data_df = declension_fio_by_case(data_df)
         """
             Конвертируем даты из формата ГГГГ-ММ-ДД в ДД.ММ.ГГГГ
             """
         data_df['Дата_рождения'] = data_df['Дата_рождения'].apply(convert_date_yandex)
         data_df['Дата_выдачи_паспорта'] = data_df['Дата_выдачи_паспорта'].apply(convert_date_yandex)
+
+
+
+
+
+
+
+
+
+
+
+        data_df.to_excel('data/Результат/dasd.xlsx',index=False,header=True)
 
 
 

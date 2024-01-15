@@ -12,8 +12,11 @@ def convert_date_yandex(value:str):
     :param value: строка
     :return:дата
     """
-    date_object = datetime.strptime(value, "%Y-%m-%d") # делаем объект datetime
-    return date_object.strftime("%d.%m.%Y") # преобразуем в нужный формат
+    try:
+        date_object = datetime.strptime(value, "%Y-%m-%d") # делаем объект datetime
+        return date_object.strftime("%d.%m.%Y") # преобразуем в нужный формат
+    except ValueError:
+        return value
 
 
 def write_df_to_excel(dct_df:dict,write_index:bool)->openpyxl.Workbook:
