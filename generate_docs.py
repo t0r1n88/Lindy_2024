@@ -76,10 +76,10 @@ def copy_folder_structure(source_folder:str,destination_folder:str):
     return dct_path
 
 
-def generate_docs(descr_df:pd.DataFrame,data_df:pd.DataFrame,source_folder:str,destination_folder:str,type_program:str):
+def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destination_folder:str,type_program:str):
     """
     Основная функция генерации документов
-    :param descr_df: датафрейм с описанием курса
+    :param dct_descr: словарь с описанием курса
     :param data_df: датафрейм с данными слушателей
     :param source_folder: исходная папка
     :param destination_folder: конечная папка

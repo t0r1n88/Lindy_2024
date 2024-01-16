@@ -4,6 +4,7 @@
 """
 from create_fis_frdo import create_fis_frdo # модуль для создания файла фис фрдо
 from decl_case import declension_fio_by_case # модуль для склонения фио и создания инициалов
+from generate_docs import generate_docs # модуль для создания документов
 from support_functions import * # вспомогательные функции
 import pandas as pd
 import openpyxl
@@ -112,20 +113,19 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
         # получаем списки валидных названий колонок
         descr_valid_cols,descr_not_valid_cols = selection_name_column(list(descr_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
-        print(descr_valid_cols)
-        print(descr_not_valid_cols)
         data_valid_cols, data_not_valid_cols = selection_name_column(list(data_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
-        print(data_valid_cols)
-        print(data_not_valid_cols)
 
+        # заполняем наны пробелами
+        descr_df.fillna(' ',inplace=True)
+        data_df.fillna(' ',inplace=True)
 
-
-        # Создаем словари
         # Словарь с описанием курса
         dct_descr = dict()
         for name_column in descr_valid_cols:
             dct_descr[name_column] = descr_df.loc[0,name_column]
         print(dct_descr)
+
+        generate_docs(dct_descr,data_df,folder_template,result_folder,type_program)
 
 
 
