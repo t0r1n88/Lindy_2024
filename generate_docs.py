@@ -42,6 +42,8 @@ class NotFolderSource(Exception):
 
 
 
+
+
 def copy_folder_structure(source_folder:str,destination_folder:str):
     """
     Функция для копирования структуры папок внутри выбраной папки

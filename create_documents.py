@@ -26,6 +26,9 @@ class NotNameColumn(Exception):
     pass
 
 
+
+
+
 def create_docs(data_file:str,folder_template:str,result_folder:str):
     """
     Скрипт для сопроводительной документации. Точка входа
@@ -81,11 +84,50 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         """
             Конвертируем даты из формата ГГГГ-ММ-ДД в ДД.ММ.ГГГГ
             """
-        data_df['Дата_рождения'] = data_df['Дата_рождения'].apply(convert_date_yandex)
-        data_df['Дата_выдачи_паспорта'] = data_df['Дата_выдачи_паспорта'].apply(convert_date_yandex)
+        # делаем строковыми названия колонок
+        descr_df.columns = list(map(str,descr_df.columns))
+        data_df.columns = list(map(str,data_df.columns))
+        # Обрабатываем колонки с датами в описании
+        lst_date_columns_descr = []  # список для колонок с датами
+        for idx, column in enumerate(descr_df.columns):
+            if 'дата' in column.lower():
+                lst_date_columns_descr.append(idx)
+
+        descr_df = convert_string_date(descr_df,lst_date_columns_descr)
+
+        # обрабатываем колонки с датами в списке
+        lst_date_columns_data = []  # список для колонок с датами
+        for idx, column in enumerate(data_df.columns):
+            if 'дата' in column.lower():
+                lst_date_columns_data.append(idx)
+        data_df = convert_string_date(data_df,lst_date_columns_data)
+
+        # data_df['Дата_рождения'] = data_df['Дата_рождения'].apply(convert_date_yandex)
+        # data_df['Дата_выдачи_паспорта'] = data_df['Дата_выдачи_паспорта'].apply(convert_date_yandex)
 
         # Создаем файл ФИС-ФРДО
         create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,data_file)
+
+        # создаем словари с данными для колонок описания программы
+
+        # получаем списки валидных названий колонок
+        descr_valid_cols,descr_not_valid_cols = selection_name_column(list(descr_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
+        print(descr_valid_cols)
+        print(descr_not_valid_cols)
+        data_valid_cols, data_not_valid_cols = selection_name_column(list(data_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
+        print(data_valid_cols)
+        print(data_not_valid_cols)
+
+
+
+        # Создаем словари
+        # Словарь с описанием курса
+        dct_descr = dict()
+        for name_column in descr_valid_cols:
+            dct_descr[name_column] = descr_df.loc[0,name_column]
+        print(dct_descr)
+
+
 
 
 

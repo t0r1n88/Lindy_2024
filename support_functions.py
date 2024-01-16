@@ -1,10 +1,12 @@
 """
 Вспомогательные функции
 """
-from datetime import datetime
+import datetime
 import openpyxl
+import pandas as pd
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.utils import get_column_letter
+import re
 
 def convert_date_yandex(value:str):
     """
@@ -13,10 +15,42 @@ def convert_date_yandex(value:str):
     :return:дата
     """
     try:
-        date_object = datetime.strptime(value, "%Y-%m-%d") # делаем объект datetime
+        date_object = datetime.datetime.strptime(value, "%Y-%m-%d") # делаем объект datetime
         return date_object.strftime("%d.%m.%Y") # преобразуем в нужный формат
     except ValueError:
         return value
+
+def create_doc_convert_date(cell):
+    """
+    Функция для конвертации даты при создании документов
+    :param cell:
+    :return:
+    """
+    try:
+        string_date = datetime.datetime.strftime(cell, '%d.%m.%Y')
+        return string_date
+    except ValueError:
+        return 'Не удалось конвертировать дату.Проверьте значение ячейки!!!'
+    except TypeError:
+        return 'Не удалось конвертировать дату.Проверьте значение ячейки!!!'
+
+
+def convert_string_date(df:pd.DataFrame,lst_date_columns:list)->pd.DataFrame:
+    """
+    Функция для коневертации колонок с датами в строковый формат для правильного отображения
+    :param df: датафрейм с данными
+    :param lst_date_columns: список с индексами колонок с датами
+    :return: исправленный датафрейм
+    """
+
+    # Конвертируем в пригодный строковый формат
+    for i in lst_date_columns:
+        df.iloc[:, i] = pd.to_datetime(df.iloc[:, i], errors='coerce', dayfirst=True)
+        df.iloc[:, i] = df.iloc[:, i].apply(create_doc_convert_date)
+
+
+    return df
+
 
 
 def write_df_to_excel(dct_df:dict,write_index:bool)->openpyxl.Workbook:
@@ -51,6 +85,19 @@ def write_df_to_excel(dct_df:dict,write_index:bool)->openpyxl.Workbook:
     if len(wb.sheetnames) >= 2 and 'Sheet' in wb.sheetnames:
         del wb['Sheet']
     return wb
+
+
+def selection_name_column(lst_cols: list, pattern: str):
+    """
+    Функция для отбора значений попадающих под условие
+    :param lst_cols: список с строками
+    :param pattern: паттерн отбора
+    :return:кортеж из 2 списков, первй список это подошедшие под условие а второй список это не подошедшие
+    """
+    valid_cols = [name_col for name_col in lst_cols if re.search(pattern,name_col)]
+    not_valid_cols = (set(lst_cols)).difference(set(valid_cols))
+    return valid_cols,not_valid_cols
+
 
 
 
