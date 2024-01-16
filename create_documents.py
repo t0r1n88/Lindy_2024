@@ -38,7 +38,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
         # Проверяем наличие колонок
-        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Категория','Дата_начало','Дата_конец','Объем',
+        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Разряд_класс','Дата_начало','Дата_конец','Объем',
                            'ФИО_руководитель','Должность_руководитель','Основание_родит_падеж','ФИО_секретарь','База'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
@@ -58,7 +58,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         name_program = descr_df.loc[0,'Наименование_программы']
         type_course  = descr_df.loc[0,'Тип_программы']
         name_qval = descr_df.loc[0,'Квалификация_профессия_специальность']
-        category = descr_df.loc[0,'Категория']
+        category = descr_df.loc[0,'Разряд_класс']
         date_begin = descr_df.loc[0,'Дата_начало']
         date_end = descr_df.loc[0,'Дата_конец']
         volume = descr_df.loc[0,'Объем']
@@ -97,7 +97,8 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 
 
-        data_df.to_excel('data/Результат/dasd.xlsx',index=False,header=True)
+        # data_df.to_excel('data/Результат/dasd.xlsx',index=False,header=True)
+        # descr_df.to_excel('data/Результат/Исходник Описание.xlsx',index=False,header=True)
 
 
 
