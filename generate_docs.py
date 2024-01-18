@@ -63,7 +63,7 @@ def combine_all_docx(filename_master, files_lst,path_to_end_folder_doc):
         doc_temp = Document(files_lst[i])
         composer.append(doc_temp)
     # Сохраняем файл
-    composer.save(f"{path_to_end_folder_doc}/Общий файл от {current_time}.docx")
+    composer.save(f"{path_to_end_folder_doc}/ОБЩИЙ файл от {current_time}.docx")
 
 
 def copy_folder_structure(source_folder:str,destination_folder:str):

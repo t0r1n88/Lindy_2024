@@ -146,6 +146,36 @@ def split_fio(value:str,number):
         return 'Проверьте количество слов, должно быть 3 разделенных пробелами слова'
 
 
+def declension_lst_fio_columns_by_case(df:pd.DataFrame,lst_name_columns:list)->pd.DataFrame:
+    """
+    Склонение по падежам и создание инициалов по нескольким колонкам с ФИО
+    :param df:датафрейм
+    :param lst_name_columns: список колонок которые нужно обработать
+    :return:измененный датафрейм
+    """
+    # temp_df = pd.DataFrame()  # временный датафрейм для хранения колонок просклоненных по падежам
+    for fio_column in lst_name_columns:
+        index_fio_column = lst_name_columns.index(fio_column)  # получаем индекс
+        # Обрабатываем nan значения и те которые обозначены пробелом
+        df[fio_column].fillna('Не заполнено', inplace=True)
+        df[fio_column] = df[fio_column].apply(lambda x: x.strip())
+        df[fio_column] = df[fio_column].apply(
+            lambda x: x if x else 'Не заполнено')  # Если пустая строка то заменяем на значение Не заполнено
+        # создаем колонки
+        df[f'{fio_column}_Родительный_падеж'] = df[fio_column].apply(lambda x: decl_on_case(x, Case.GENITIVE))
+        df[f'{fio_column}_Дательный_падеж'] = df[fio_column].apply(lambda x: decl_on_case(x, Case.DATIVE))
+        df[f'{fio_column}_Винительный_падеж'] = df[fio_column].apply(lambda x: decl_on_case(x, Case.ACCUSATIVE))
+        df[f'{fio_column}_Творительный_падеж'] = df[fio_column].apply(lambda x: decl_on_case(x, Case.INSTRUMENTAL))
+        df[f'{fio_column}_Предложный_падеж'] = df[fio_column].apply(lambda x: decl_on_case(x, Case.PREPOSITIONAL))
+        df[f'{fio_column}_ФИ'] = df[fio_column].apply(lambda x: create_initials(x, 'ФИ', 'без пробела'))
+        df[f'{fio_column}_ИФ'] = df[fio_column].apply(lambda x: create_initials(x, 'ИФ', 'без пробела'))
+        df[f'{fio_column}_ФИ_пробел'] = df[fio_column].apply(lambda x: create_initials(x, 'ФИ', 'пробел'))
+        df[f'{fio_column}_ИФ_пробел'] = df[fio_column].apply(lambda x: create_initials(x, 'ИФ', 'пробел'))
+
+    return df
+
+
+
 
 def declension_fio_by_case(df:pd.DataFrame)->pd.DataFrame:
     """

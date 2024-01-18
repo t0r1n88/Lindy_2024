@@ -3,7 +3,8 @@
 Основной скрипт
 """
 from create_fis_frdo import create_fis_frdo # модуль для создания файла фис фрдо
-from decl_case import declension_fio_by_case # модуль для склонения фио и создания инициалов
+from decl_case import declension_fio_by_case # функция для склонения фио и создания инициалов
+from decl_case import declension_lst_fio_columns_by_case # функция для склонения колонок с фио из листа описания курса
 from generate_docs import generate_docs # модуль для создания документов
 from support_functions import * # вспомогательные функции
 import pandas as pd
@@ -42,8 +43,8 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
         # Проверяем наличие колонок
-        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Разряд_класс','Дата_начало','Дата_конец','Объем',
-                           'ФИО_руководитель','Должность_руководитель','Основание_родит_падеж','ФИО_секретарь','База'}
+        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объем',
+                           'Руководитель','Секретарь','Преподаватель','База'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn
@@ -58,20 +59,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             type_program = 'ПО'
 
 
-        # Создаем единичные переменные
-        name_program = descr_df.loc[0,'Наименование_программы']
-        type_course  = descr_df.loc[0,'Тип_программы']
-        name_qval = descr_df.loc[0,'Квалификация_профессия_специальность']
-        category = descr_df.loc[0,'Разряд_класс']
-        date_begin = descr_df.loc[0,'Дата_начало']
-        date_end = descr_df.loc[0,'Дата_конец']
-        volume = descr_df.loc[0,'Объем']
-        fio_chief = descr_df.loc[0,'ФИО_руководитель']
-        chief_position = descr_df.loc[0,'Должность_руководитель']
-        name_doc_rod_case = descr_df.loc[0,'Основание_родит_падеж']
-        fio_secretary = descr_df.loc[0,'ФИО_секретарь']
-        base = descr_df.loc[0,'База']
-
         # Предобработка датафрейма с данными слушателей
         data_df = pd.read_excel(data_file, sheet_name='Данные', dtype=str)  # получаем данные
         # Проверяем наличие нужных колонок в файле с данными
@@ -82,6 +69,13 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             raise NotNameColumn  # если есть разница вызываем и обрабатываем исключение
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
         data_df = declension_fio_by_case(data_df)
+        # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
+        descr_fio_cols =['Руководитель','Секретарь','Преподаватель'] # список колонок для которых нужно создать падежи и инициалы
+        descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
+
+
+
+
         """
             Конвертируем даты из формата ГГГГ-ММ-ДД в ДД.ММ.ГГГГ
             """
@@ -102,9 +96,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             if 'дата' in column.lower():
                 lst_date_columns_data.append(idx)
         data_df = convert_string_date(data_df,lst_date_columns_data)
-
-        # data_df['Дата_рождения'] = data_df['Дата_рождения'].apply(convert_date_yandex)
-        # data_df['Дата_выдачи_паспорта'] = data_df['Дата_выдачи_паспорта'].apply(convert_date_yandex)
 
         # Создаем файл ФИС-ФРДО
         create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,data_file)
