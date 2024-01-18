@@ -123,7 +123,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         dct_descr = dict()
         for name_column in descr_valid_cols:
             dct_descr[name_column] = descr_df.loc[0,name_column]
-        print(dct_descr)
 
         generate_docs(dct_descr,data_df,folder_template,result_folder,type_program)
 
