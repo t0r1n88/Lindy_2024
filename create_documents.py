@@ -27,7 +27,11 @@ class NotNameColumn(Exception):
     """
     pass
 
-
+class SameNameColumn(Exception):
+    """
+    Исключение для обработки случая когда в двух листах есть одинаковые названия колонок
+    """
+    pass
 
 
 
@@ -82,6 +86,12 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # делаем строковыми названия колонок
         descr_df.columns = list(map(str,descr_df.columns))
         data_df.columns = list(map(str,data_df.columns))
+
+        # проверяем на совпадение названий колонок в обоих листах
+        intersection_columns = set(descr_df.columns).intersection(set(data_df.columns))
+        if len(intersection_columns) > 0:
+            raise SameNameColumn
+
         # Обрабатываем колонки с датами в описании
         lst_date_columns_descr = []  # список для колонок с датами
         for idx, column in enumerate(descr_df.columns):
