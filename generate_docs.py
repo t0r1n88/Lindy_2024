@@ -55,17 +55,13 @@ def copy_folder_structure(source_folder:str,destination_folder:str):
     # subfolders = [f for f in os.listdir(source_folder) if os.path.isdir(os.path.join(source_folder, f))]
     # print(subfolders)
     lst_source_folders = [] # список для хранения путей к папкам в исходной папке
-    print(source_folder)
-    print(destination_folder)
 
     for dirname, dirnames, filenames in os.walk(source_folder):
         # print path to all subdirectories first.
         for subdirname in dirnames:
             lst_source_folders.append(f'{dirname}/{subdirname}')
-    print(lst_source_folders)
     # заменяем папку назначения
     lst_dest_folders = [path.replace(source_folder,destination_folder) for path in lst_source_folders]
-    print(lst_dest_folders)
     for path_folder in lst_dest_folders:
         if not os.path.exists(path_folder):
             os.makedirs(path_folder)
@@ -86,11 +82,23 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
     :param type_program: тип программы ДПО или ПО
     :return: Сопроводительная документация в формате docx
     """
+    st_multi_docs = {'удостоверение','справка','согласие','сертификат','заявление'} # список документов для которых нужно генерировать много файлов
+    # Словарь для получения длинных выражений по типу программы
+    where_type_program = {'Повышение квалификации':'на дополнительную профессиональную программу повышения квалификации',
+                          'Профессиональная переподготовка':'на дополнительную профессиональную программу профессиональной переподготовки',
+                          'Программа профессиональной подготовки по профессии рабочего, должности служащего':'на основную программу профессионального обучения профессиональной подготовки',
+                          'Программа переподготовки рабочих, служащих':'на основную программу профессионального обучения профессиональной переподготовки',
+                          'Программа повышения квалификации рабочих, служащих':'на основную программу профессионального обучения повышения квалификации рабочих, служащих',}
+    dct_descr['Программа_куда'] = where_type_program[dct_descr['Тип_программы']]
+    print(dct_descr['Программа_куда'])
     dct_path = copy_folder_structure(source_folder,destination_folder) # копируем структуру папок
     for source_folder,dest_folder in dct_path.items():
         for file in os.listdir(source_folder):
             if file.endswith('.docx') and not file.startswith('~$'): # получаем только файлы docx и не временные
+                # определяем тип создаваемого документа
                 print(file)
+                type_doc = re.search(r'\b[Д]*ПО\b',file).group()
+                print(type_doc)
 
 
 

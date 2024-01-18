@@ -147,7 +147,7 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
                 fis_frdo_dpo['Шаблон'].column_dimensions['AE'].width = 20
 
 
-            fis_frdo_dpo.save(f'{result_folder}/ФИС-ФРДО ДПО {current_time}.xlsx')
+            fis_frdo_dpo.save(f'{result_folder}/ФИС-ФРДО/ФИС-ФРДО ДПО {current_time}.xlsx')
         elif type_program == 'ПО':
             dct_df = df.to_dict(
                 orient='list')  # превращаем в словарь где ключ это название колонки а значение это список
@@ -189,7 +189,7 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
                 fis_frdo_po['Шаблон'].column_dimensions['AD'].width = 30
                 fis_frdo_po['Шаблон'].column_dimensions['AE'].width = 20
 
-            fis_frdo_po.save(f'{result_folder}/ФИС-ФРДО ПО {current_time}.xlsx')
+            fis_frdo_po.save(f'{result_folder}/ФИС-ФРДО/ФИС-ФРДО ПО {current_time}.xlsx')
 
 
 
