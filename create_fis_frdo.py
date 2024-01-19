@@ -157,7 +157,9 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
                 fis_frdo_dpo['Шаблон'].column_dimensions['AD'].width = 30
                 fis_frdo_dpo['Шаблон'].column_dimensions['AE'].width = 20
 
-
+            # проверяем наличие папки ФИС-ФРДО
+            if not os.path.exists(f'{result_folder}/ФИС-ФРДО'):
+                os.makedirs(f'{result_folder}/ФИС-ФРДО')
             fis_frdo_dpo.save(f'{result_folder}/ФИС-ФРДО/ФИС-ФРДО ДПО {current_time}.xlsx')
         elif type_program == 'ПО':
             dct_df = df.to_dict(
@@ -208,7 +210,9 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
                 fis_frdo_po['Шаблон'].column_dimensions['Z'].width = 30
                 fis_frdo_po['Шаблон'].column_dimensions['AD'].width = 30
                 fis_frdo_po['Шаблон'].column_dimensions['AE'].width = 20
-
+            # проверяем наличие папки ФИС-ФРДО
+            if not os.path.exists(f'{result_folder}/ФИС-ФРДО'):
+                os.makedirs(f'{result_folder}/ФИС-ФРДО')
             fis_frdo_po.save(f'{result_folder}/ФИС-ФРДО/ФИС-ФРДО ПО {current_time}.xlsx')
 
 
@@ -217,6 +221,7 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
         messagebox.showerror('Создание документов ДПО,ПО',
                              f'В папке {folder_template}/ФИС-ФРДО не найден файл шаблона ФИС-ФРДО.\n'
                                                               f'Файлы должны иметь название - Шаблон ФИС-ФРДО ДПО и Шаблон ФИС-ФРДО ПО')
+
 
 
 

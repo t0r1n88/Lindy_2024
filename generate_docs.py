@@ -143,6 +143,10 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                         # получаем название файла и убираем недопустимые символы < > : " /\ | ? *
                         name_file = row['ФИО']
                         name_file = re.sub(r'[\r\b\n\t<>:"?*|\\/]', '_', name_file)
+                        type_file = re.search(r'\b(?!Шаблон)[ЁА-Я][ёа-я]+\b',file).group()
+                        if type_file:
+                            name_file = f'{type_file} {name_file}'
+
                         # проверяем файл на наличие, если файл с таким названием уже существует то добавляем окончание
                         if name_file in used_name_file:
                             name_file = f'{name_file}_{idx}'
@@ -172,6 +176,9 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                         # Запускаем функцию
                         combine_all_docx(main_doc, files_lst, dest_folder)
                 else:
+                    # генерируем текущее время
+                    t = time.localtime()
+                    current_time = time.strftime('%H_%M_%S', t)
                     doc = DocxTemplate(f'{source_folder}/{file}')
                     context = dict()
                     context['Итог'] = lst_data_df.to_dict('records')
@@ -188,7 +195,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                     if name_file in used_name_file:
                         name_file = f'{name_file}_{idx}'
 
-                    doc.save(f'{dest_folder}/{name_file[:80]}.docx')
+                    doc.save(f'{dest_folder}/{name_file[:80]} {current_time}.docx')
 
 
 
