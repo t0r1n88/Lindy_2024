@@ -120,6 +120,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # получаем списки валидных названий колонок
         descr_valid_cols,descr_not_valid_cols = selection_name_column(list(descr_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
         data_valid_cols, data_not_valid_cols = selection_name_column(list(data_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
+        # TODO файл с ошибками и предупреждениями
 
         # заполняем наны пробелами
         descr_df.fillna(' ',inplace=True)
