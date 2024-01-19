@@ -34,16 +34,17 @@ class NotNameColumn(Exception):
     """
     pass
 
-def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_number_column:dict,dct_descr_number:dict,dct_descr_df:dict)->openpyxl.Workbook:
+def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_number_column:dict,dct_descr_number:dict,dct_descr_df:dict,
+                        dct_constant_number_column:dict,dct_constant_value_column:dict)->openpyxl.Workbook:
     """
     Функция для записи данных в шаблон ФИС -ФРДО
     :param template_fis_frdo_dpo: шаблон ФИС-ФРДО
     :param dct_df: словарь с данными вида -название колонки:список данных в колонке
     :param dct_number_column: словарь вида -название колонки: порядковый номер колонки куда надо записывать данные
     :param dct_descr_number: словарь вида -название колонки: порядковый номер колонки куда надо записывать данные для описания курса
-
     :param dct_descr_df: датафрейм с описанием программы
-    :param type_program: тип программы
+    :param dct_constant_number_column: словарь с номерами колонок для константных значений
+    :param dct_constant_value_column: словарь с значениями констант
     :return: заполненый шаблон
     """
     count_row = len(dct_df['Фамилия']) # получаем количество строк в датафрейме
@@ -72,10 +73,6 @@ def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_
         dct_descr_df['Объем'][0] = 'Некорректное значение. Должно быть указано целое число'
 
 
-
-
-
-
     for name_column,number_col in dct_number_column.items():
         # перебираем словарь с порядковыми номерами колонок
         start_row = 2  # строка с которой будет начинаться записи
@@ -83,12 +80,16 @@ def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_
             template_fis_frdo_dpo['Шаблон'].cell(row=start_row, column=number_col, value=value)
             start_row += 1
 
-
     # пха тройный цикл ну да ладно
     for name_column,number_col in dct_descr_number.items():
         for value in dct_descr_df[name_column]:
-            for row in range(2,count_row+2): # записываем данные из словаря с данными
+            for row in range(2,count_row+2): # записываем данные из словаря с описанием
                 template_fis_frdo_dpo['Шаблон'].cell(row=row, column=number_col, value=value)
+
+
+    for name_column,number_col in dct_constant_number_column.items():
+        for row in range(2,count_row+2): # записываем данные из словаря с константами
+            template_fis_frdo_dpo['Шаблон'].cell(row=row, column=number_col, value=dct_constant_value_column[name_column])
 
     return template_fis_frdo_dpo
 
@@ -122,10 +123,20 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
             dct_descr_number = {'Тип_программы':10,'Наименование_программы':11,'Квалификация_профессия_специальность':14,
                                  'Дата_начало':19,'Дата_конец':20,'Объем':21}
 
+            # словари для данных которые не меняются
+            dct_constant_number_column = {'Статус документа':2,'Подтверждение утраты':3,'Подтверждение обмена':4,'Подтверждение уничтожения':5,
+            'Серия документа':6,'Форма получения образования на момент прекращения образовательных отношений':30,
+                                          'Гражданство получателя (код страны по ОКСМ)':31,}
+
+            dct_constant_value_column = {'Статус документа':'Оригинал', 'Подтверждение утраты':'Нет', 'Подтверждение обмена':'Нет', 'Подтверждение уничтожения':'Нет',
+            'Серия документа':'нет', 'Форма получения образования на момент прекращения образовательных отношений':'в образовательной организации',
+                                         'Гражданство получателя (код страны по ОКСМ)':643, }
+
 
 
             template_fis_frdo_dpo = openpyxl.load_workbook(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx')
-            fis_frdo_dpo = write_data_fis_frdo(template_fis_frdo_dpo,dct_df,dct_number_column,dct_descr_number,dct_descr_df) # Записываем в шаблон
+            fis_frdo_dpo = write_data_fis_frdo(template_fis_frdo_dpo,dct_df,dct_number_column,dct_descr_number,dct_descr_df,
+                                               dct_constant_number_column,dct_constant_value_column) # Записываем в шаблон
             # делаем колонки по ширине содержимого
             for column in fis_frdo_dpo['Шаблон'].columns:
                 max_length = 0
@@ -161,9 +172,18 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
             dct_descr_number = {'Тип_программы':10,'Наименование_программы':11,'Квалификация_профессия_специальность':12,'Разряд_класс':13,
                                  'Дата_начало':14,'Дата_конец':15,'Объем':16}
 
+            # словари для данных которые не меняются
+            dct_constant_number_column = {'Статус документа':2,'Подтверждение утраты':3,'Подтверждение обмена':4,'Подтверждение уничтожения':5,
+            'Серия документа':6,'Форма получения образования на момент прекращения образовательных отношений':26,
+                                          'Гражданство получателя (код страны по ОКСМ)':23,}
+
+            dct_constant_value_column = {'Статус документа':'Оригинал', 'Подтверждение утраты':'Нет', 'Подтверждение обмена':'Нет', 'Подтверждение уничтожения':'Нет',
+            'Серия документа':'нет', 'Форма получения образования на момент прекращения образовательных отношений':'в образовательной организации',
+                                         'Гражданство получателя (код страны по ОКСМ)':643, }
+
             template_fis_frdo_po = openpyxl.load_workbook(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ПО.xlsx')
             fis_frdo_po = write_data_fis_frdo(template_fis_frdo_po, dct_df, dct_number_column, dct_descr_number,
-                                               dct_descr_df)  # Записываем в шаблон
+                                               dct_descr_df,dct_constant_number_column,dct_constant_value_column)  # Записываем в шаблон
             # делаем колонки по ширине содержимого
             for column in fis_frdo_po['Шаблон'].columns:
                 max_length = 0
@@ -185,7 +205,7 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
                 fis_frdo_po['Шаблон'].column_dimensions['T'].width = 20
                 fis_frdo_po['Шаблон'].column_dimensions['U'].width = 20
                 fis_frdo_po['Шаблон'].column_dimensions['W'].width = 20
-                fis_frdo_po['Шаблон'].column_dimensions['Z'].width = 20
+                fis_frdo_po['Шаблон'].column_dimensions['Z'].width = 30
                 fis_frdo_po['Шаблон'].column_dimensions['AD'].width = 30
                 fis_frdo_po['Шаблон'].column_dimensions['AE'].width = 20
 
