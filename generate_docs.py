@@ -34,9 +34,9 @@ logging.basicConfig(
     datefmt='%H:%M:%S',
 )
 
-class NotFolderSource(Exception):
+class NotFileSource(Exception):
     """
-    Исключение для обработки случая когда не найдены папки внутри исходной папки
+    Исключение для обработки случая когда не найдены файлы внутри исходной папки
     """
     pass
 
@@ -74,23 +74,38 @@ def copy_folder_structure(source_folder:str,destination_folder:str):
     :return: Структура папок как в исходной папке
     """
     # Получаем список папок внутри source_folder
-    # subfolders = [f for f in os.listdir(source_folder) if os.path.isdir(os.path.join(source_folder, f))]
-    # print(subfolders)
+
+    lst_subdirs =  [] # список для подпапок
+    lst_files = [] # список для файлов
     lst_source_folders = [] # список для хранения путей к папкам в исходной папке
 
     for dirname, dirnames, filenames in os.walk(source_folder):
         # print path to all subdirectories first.
         for subdirname in dirnames:
+            lst_subdirs.append(subdirname)
             lst_source_folders.append(f'{dirname}/{subdirname}')
+
+    # ищем файлы
+    for dirname, dirnames, filenames in os.walk(source_folder):
+        for file in filenames:
+            lst_files.append(file)
+
     # заменяем папку назначения
     lst_dest_folders = [path.replace(source_folder,destination_folder) for path in lst_source_folders]
     for path_folder in lst_dest_folders:
         if not os.path.exists(path_folder):
             os.makedirs(path_folder)
     # создаем словарь где ключ это путь к папкам в исходном файле а значение это путь к папкам в конечной папке
-    dct_path = dict(zip(lst_source_folders,lst_dest_folders))
-    if len(dct_path) == 0:
-        raise NotFolderSource
+    # проверяем количество найденных папок
+    if len(lst_subdirs) != 0:
+        dct_path = dict(zip(lst_source_folders,lst_dest_folders))
+    else:
+        # если подпапок нет то сохраняем в итоговую папку
+        dct_path = {source_folder:destination_folder}
+
+    if len(lst_files) == 0:
+        raise NotFileSource
+
     return dct_path
 
 
