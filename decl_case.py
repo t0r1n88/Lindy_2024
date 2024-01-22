@@ -1,9 +1,12 @@
 """
 Склонение ФИО по падежам
 """
+import openpyxl
 import pandas as pd
 from tkinter import messagebox
 import re
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.utils import get_column_letter
 from pytrovich.detector import PetrovichGenderDetector
 from pytrovich.enums import NamePart, Gender, Case
 from pytrovich.maker import PetrovichDeclinationMaker
@@ -177,10 +180,11 @@ def declension_lst_fio_columns_by_case(df:pd.DataFrame,lst_name_columns:list)->p
 
 
 
-def declension_fio_by_case(df:pd.DataFrame)->pd.DataFrame:
+def declension_fio_by_case(df:pd.DataFrame,result_folder:str)->pd.DataFrame:
     """
     Функция для склоения фио по падежам , создания инициалов
     :param df: датафрейм с данными
+    :param result_folder: конечная папка
     :return: датафрейм
     """
     try:
@@ -279,6 +283,27 @@ def declension_fio_by_case(df:pd.DataFrame)->pd.DataFrame:
             lambda x: create_initials(x, 'ИФ', 'без пробела'))
         temp_df['Инициалы_фамилия_пред_падеж_пробел'] = temp_df['Предложный_падеж'].apply(
             lambda x: create_initials(x, 'ИФ', 'пробел'))
+
+        # сохраняем таблицу для проверки правильности склонения
+        temp_df.insert(0,'ФИО',df['ФИО'])
+        wb = openpyxl.Workbook()
+        for row in dataframe_to_rows(temp_df,index=False,header=True):
+            wb[wb.sheetnames[0]].append(row)
+        for column in wb[wb.sheetnames[0]].columns:
+            max_length = 0
+            column_name = get_column_letter(column[0].column)
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            wb[wb.sheetnames[0]].column_dimensions[column_name].width = adjusted_width
+            wb.save(f'{result_folder}/Проверка правильности склонения ФИО.xlsx')
+
+
+
 
         # Вставляем получившиеся колонки после базовой колонки с фио
         df.insert(index_fio_column + 1, 'Родительный_падеж', temp_df['Родительный_падеж'])

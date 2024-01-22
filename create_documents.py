@@ -72,7 +72,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         if len(diff_cols) != 0:
             raise NotNameColumn  # если есть разница вызываем и обрабатываем исключение
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
-        data_df = declension_fio_by_case(data_df)
+        data_df = declension_fio_by_case(data_df,result_folder)
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
         descr_fio_cols =['Руководитель','Секретарь','Преподаватель','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
         descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
