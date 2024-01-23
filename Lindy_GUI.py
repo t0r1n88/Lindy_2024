@@ -267,7 +267,7 @@ if __name__ == '__main__':
        Создаем вкладку для предварительной обработки списка
        """
     tab_preparation = ttk.Frame(tab_control)
-    tab_control.add(tab_preparation, text='Обработка\nсписка')
+    tab_control.add(tab_preparation, text='Обработка списка')
 
     preparation_frame_description = LabelFrame(tab_preparation)
     preparation_frame_description.pack()
