@@ -19,6 +19,7 @@ import warnings
 warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 warnings.simplefilter(action='ignore', category=UserWarning)
+warnings.filterwarnings("ignore", category=Warning)
 pd.options.mode.chained_assignment = None
 import platform
 import logging

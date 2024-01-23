@@ -151,6 +151,9 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Выбрана одна и та же папка в качесте исходной и конечной\n'
                              f'Исходня и конечная папки должны быть разными !!!')
+    except PermissionError as e:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'Закройте файлы созданные программой')
 
     else:
         messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
