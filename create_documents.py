@@ -33,7 +33,11 @@ class SameNameColumn(Exception):
     """
     pass
 
-
+class SamePathFolder(Exception):
+    """
+    Исключение для случая когда одна и та же папка выбрана в качестве источника и конечной папки
+    """
+    pass
 
 def create_docs(data_file:str,folder_template:str,result_folder:str):
     """
@@ -44,6 +48,8 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
     :return: Документация в формате docx и файл ФИс-ФРДО
     """
     try:
+        if folder_template == result_folder:
+            raise SamePathFolder
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
         # Проверяем наличие колонок
@@ -136,6 +142,16 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
     except NotNameColumn:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В файле {data_file} не найдены следующие колонки {diff_cols}')
+    except SameNameColumn:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'На листе с описанием и на листе со списком найдены одинаковые названия колонок {intersection_columns}\n'
+                             f'переименуйте колонки')
+
+    except SamePathFolder:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'Выбрана одна и та же папка в качесте исходной и конечной\n'
+                             f'Исходня и конечная папки должны быть разными !!!')
+
     else:
         messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
 
