@@ -1,4 +1,5 @@
 from create_documents import create_docs # импортируем основную функцию генерации документов
+from prepare_data import prepare_list # импортируем функцию очистки данных
 import pandas as pd
 from tkinter import *
 from tkinter import filedialog
@@ -158,6 +159,42 @@ def processing_create_docs():
         messagebox.showerror('Создание документов ДПО,ПО',
                              f'Выберите файл с данными и папку куда будет генерироваться файл')
 
+"""
+Функции для вкладки подготовка файлов
+"""
+def select_prep_file():
+    """
+    Функция для выбора файла который нужно преобразовать
+    :return:
+    """
+    global glob_prep_file
+    # Получаем путь к файлу
+    glob_prep_file = filedialog.askopenfilename(filetypes=(('Excel files', '*.xlsx'), ('all files', '*.*')))
+
+
+def select_end_folder_prep():
+    """
+    Функция для выбора папки куда будет сохранен преобразованный файл
+    :return:
+    """
+    global glob_path_to_end_folder_prep
+    glob_path_to_end_folder_prep = filedialog.askdirectory()
+
+
+def processing_preparation_file():
+    """
+    Функция для генерации документов
+    """
+    try:
+        prepare_list(glob_prep_file,glob_path_to_end_folder_prep)
+
+    except NameError:
+        messagebox.showerror('Веста Обработка таблиц и создание документов',
+                             f'Выберите файл с данными и папку куда будет генерироваться файл')
+        logging.exception('AN ERROR HAS OCCURRED')
+
+
+
 
 if __name__ == '__main__':
     window = Tk()
@@ -225,6 +262,51 @@ if __name__ == '__main__':
     btn_process_create_docs = Button(tab_create_docs,text='4) Создать документы', font=('Arial Bold', 14),
                                         command=processing_create_docs)
     btn_process_create_docs.pack(padx=10, pady=10)
+
+    """
+       Создаем вкладку для предварительной обработки списка
+       """
+    tab_preparation = ttk.Frame(tab_control)
+    tab_control.add(tab_preparation, text='Обработка\nсписка')
+
+    preparation_frame_description = LabelFrame(tab_preparation)
+    preparation_frame_description.pack()
+
+    lbl_hello_preparation = Label(preparation_frame_description,
+                                  text='Центр опережающей профессиональной подготовки Республики Бурятия\n'
+                                       'Очистка от лишних пробелов и символов; поиск пропущенных значений\n в колонках с персональными данными,'
+                                       '(ФИО,паспортные данные,\nтелефон,e-mail,дата рождения,ИНН)\n преобразование СНИЛС в формат ХХХ-ХХХ-ХХХ ХХ.\n'
+                                       'Создание списка дубликатов по каждой колонке\n'
+                                       'Данные обрабатываются С ПЕРВОГО ЛИСТА В ФАЙЛЕ !!!\n'
+                                       'Для корректной работы программы уберите из таблицы\nобъединенные ячейки',
+                                  width=60)
+    lbl_hello_preparation.pack(side=LEFT, anchor=N, ipadx=25, ipady=10)
+
+    # Картинка
+    path_to_img_preparation = resource_path('logo.png')
+    img_preparation = PhotoImage(file=path_to_img_preparation)
+    Label(preparation_frame_description,
+          image=img_preparation, padx=10, pady=10
+          ).pack(side=LEFT, anchor=E, ipadx=5, ipady=5)
+
+    # Создаем область для того чтобы поместить туда подготовительные кнопки(выбрать файл,выбрать папку и т.п.)
+    frame_data_prep = LabelFrame(tab_preparation, text='Подготовка')
+    frame_data_prep.pack(padx=10, pady=10)
+
+    # Создаем кнопку выбора файла с данными
+    btn_choose_prep_file = Button(frame_data_prep, text='1) Выберите файл', font=('Arial Bold', 14),
+                                  command=select_prep_file)
+    btn_choose_prep_file.pack(padx=10, pady=10)
+
+    # Создаем кнопку выбора конечной папки
+    btn_choose_end_folder_prep = Button(frame_data_prep, text='2) Выберите конечную папку', font=('Arial Bold', 14),
+                                        command=select_end_folder_prep)
+    btn_choose_end_folder_prep.pack(padx=10, pady=10)
+
+    # Создаем кнопку очистки
+    btn_choose_processing_prep = Button(tab_preparation, text='3) Выполнить обработку', font=('Arial Bold', 20),
+                                        command=processing_preparation_file)
+    btn_choose_processing_prep.pack(padx=10, pady=10)
 
 
 

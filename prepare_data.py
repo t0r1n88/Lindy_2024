@@ -312,11 +312,10 @@ def prepare_email_columns(df:pd.DataFrame,second_option:str)->pd.DataFrame:
     return df
 
 
-def prepare_list(file_data:str,path_end_folder:str,checkbox_dupl:str):
+def prepare_list(file_data:str,path_end_folder:str):
     """
     file_data : путь к файлу который нужно преобразовать
     path_end_folder :  путь к конечной папке
-    checkbox_dupl: Проверять на дубликаты или нет. Yes or No
     """
     try:
         df = pd.read_excel(file_data,dtype=str) # считываем датафрейм
