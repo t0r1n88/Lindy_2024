@@ -354,26 +354,22 @@ def declension_fio_by_case(df:pd.DataFrame,result_folder:str)->pd.DataFrame:
         return df
 
     except NameError:
-        messagebox.showerror('Создание документов ДПО,ПО',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Выберите файлы с данными и папку куда будет генерироваться файл')
 
     except NotFIOPart:
-        messagebox.showerror('Создание документов ДПО,ПО',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Не найдены колонки Фамилия,Имя,Отчество!')
     except KeyError as e:
-        messagebox.showerror('Создание документов ДПО,ПО',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В таблице не найдена указанная колонка {e.args}')
     except ValueError:
-        messagebox.showerror('Создание документов ДПО,ПО',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В таблице нет колонки с таким названием!\nПроверьте написание названия колонки')
     except FileNotFoundError:
-        messagebox.showerror('Создание документов ДПО,ПО',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Перенесите файлы, конечную папку с которой вы работете в корень диска. Проблема может быть\n '
                              f'в слишком длинном пути к обрабатываемым файлам или конечной папке.')
-    except:
-        logging.exception('AN ERROR HAS OCCURRED')
-        messagebox.showerror('Создание документов ДПО,ПО',
-                             'Возникла ошибка!!! Подробности ошибки в файле error.log')
 
 if __name__ == '__main__':
     data_decl_case_main = 'data\Таблица для заполнения бланков.xlsx'

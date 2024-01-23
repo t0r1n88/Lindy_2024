@@ -111,7 +111,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         if os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx') and os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ПО.xlsx'):
             create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,data_file)
         else:
-            messagebox.showwarning('Создание документов ДПО,ПО',f'ПРЕДУПРЕЖДЕНИЕ !!!\n В папке {folder_template} не найдена папка ФИС-ФРДО или файлы шаблонов в этой папке.\n'
+            messagebox.showwarning('Линди Создание документов ДПО,ПО',f'ПРЕДУПРЕЖДЕНИЕ !!!\n В папке {folder_template} не найдена папка ФИС-ФРДО или файлы шаблонов в этой папке.\n'
                                    'В папке ФИС-ФРДО должно быть 2 файла, эти файлы должны иметь название Шаблон ФИС-ФРДО ПО и Шаблон ФИС-ФРДО ДПО.\n'
                                                                 'Отсутствие этой папки НЕ ПОВЛИЯЕТ на создание остальных документов.')
 
@@ -133,15 +133,11 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
         generate_docs(dct_descr,data_df,folder_template,result_folder,type_program)
 
-
-
-
-
-
-
     except NotNameColumn:
-        messagebox.showerror('Создание документов ДПО,ПО',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В файле {data_file} не найдены следующие колонки {diff_cols}')
+    else:
+        messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
 
 
 if __name__ == '__main__':
