@@ -54,7 +54,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
         # Проверяем наличие колонок
         desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объем',
-                           'Руководитель','Секретарь','Преподаватель','База','Председатель_АК'}
+                           'Руководитель','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn
@@ -80,7 +80,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
         data_df = declension_fio_by_case(data_df,result_folder)
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
-        descr_fio_cols =['Руководитель','Секретарь','Преподаватель','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
+        descr_fio_cols =['Руководитель','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
         descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
 
 
