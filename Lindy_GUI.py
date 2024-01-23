@@ -189,9 +189,8 @@ def processing_preparation_file():
         prepare_list(glob_prep_file,glob_path_to_end_folder_prep)
 
     except NameError:
-        messagebox.showerror('Веста Обработка таблиц и создание документов',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Выберите файл с данными и папку куда будет генерироваться файл')
-        logging.exception('AN ERROR HAS OCCURRED')
 
 
 

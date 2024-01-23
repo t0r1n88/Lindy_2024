@@ -380,11 +380,11 @@ def prepare_list(file_data:str,path_end_folder:str):
             for row in dataframe_to_rows(temp_df, index=False, header=True):
                 wb[short_value].append(row)
 
-            wb.save(f'{path_end_folder}/Дубликаты в каждой колонке {current_time}.xlsx')
-            # очищаем
-            wb.close()
-            del wb
-            gc.collect()
+        wb.save(f'{path_end_folder}/Дубликаты в каждой колонке {current_time}.xlsx')
+        # очищаем
+        wb.close()
+        del wb
+        gc.collect()
 
         # сохраняем
 
@@ -394,22 +394,17 @@ def prepare_list(file_data:str,path_end_folder:str):
         name_file = file_data.split('.xlsx')[0]  # получаем путь без расширения
         name_file = name_file.split('/')[-1]
         wb_main.save(f'{path_end_folder}/Обработанный {name_file} {current_time}.xlsx')
-    except NameError:
-        messagebox.showerror('Веста Обработка таблиц и создание документов',
-                             f'Выберите файлы с данными и папку куда будет генерироваться файл')
-        logging.exception('AN ERROR HAS OCCURRED')
 
     except ValueError as e:
-        messagebox.showerror('Веста Обработка таблиц и создание документов',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Ошибка при обработке значения {e.args}')
-        logging.exception('AN ERROR HAS OCCURRED')
 
     except FileNotFoundError:
-        messagebox.showerror('Веста Обработка таблиц и создание документов',
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Перенесите файлы, конечную папку с которой вы работете в корень диска. Проблема может быть\n '
                              f'в слишком длинном пути к обрабатываемым файлам или конечной папке.')
     else:
-        messagebox.showinfo('Веста Обработка таблиц и создание документов', 'Данные успешно обработаны')
+        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Данные успешно обработаны')
 
 
 if __name__ == '__main__':
