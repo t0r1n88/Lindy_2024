@@ -35,7 +35,7 @@ class NotFIOPart(Exception):
 
 def capitalize_double_name(word):
     """
-    Функция для того чтобы в двойных именах и фамилиях вторая часть была также с большой буквы
+    Функция для того чтобы в двойных именах и фамилиях, отчествах вторая часть была также с большой буквы
     """
     lst_word = word.split('-')  # сплитим по дефису
     if len(lst_word) == 1:  # если длина списка равна 1 то это не двойная фамилия и просто возвращаем слово
@@ -68,6 +68,25 @@ def case_lastname(maker, lastname, gender, case: Case):
 
         return f'{first_lastname}-{second_lastname}'
 
+
+def case_middlename(maker, middlename, gender, case: Case):
+    """
+    Функция для обработки и склонения фамилии. Это нужно для обработки случаев двойной фамилии
+    """
+
+    lst_middlename = middlename.split('-')  # сплитим по дефису
+
+    if len(lst_middlename) == 1:  # если длина списка равна 1 то это не двойная фамилия и просто обрабатываем слово
+        case_result_middlename = maker.make(NamePart.middlename, gender, case, middlename)
+        return case_result_middlename
+    elif len(lst_middlename) == 2:
+        first_middlename = lst_middlename[0].capitalize()  # делаем первую букву слова заглавной а остальные строчными
+        second_middlename = lst_middlename[1].capitalize()
+        # Склоняем по отдельности
+        first_middlename = maker.make(NamePart.MIDDLENAME, gender, case, first_middlename)
+        second_middlename = maker.make(NamePart.MIDDLENAME, gender, case, second_middlename)
+
+        return f'{first_middlename}-{second_middlename}'
 
 def detect_gender(detector, lastname, firstname, middlename):
     """
@@ -103,6 +122,7 @@ def decl_on_case(fio: str, case: Case) -> str:
         case_result_firstname = maker.make(NamePart.FIRSTNAME, gender, case, firstname)
         case_result_firstname = capitalize_double_name(case_result_firstname)  # обрабатываем случаи двойного имени
         case_result_middlename = maker.make(NamePart.MIDDLENAME, gender, case, middlename)
+        case_result_middlename = capitalize_double_name(case_result_middlename)
         # Возвращаем результат
         result_fio = f'{case_result_lastname} {case_result_firstname} {case_result_middlename}'
         return result_fio
