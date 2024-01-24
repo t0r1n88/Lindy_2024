@@ -82,7 +82,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
         descr_fio_cols =['Руководитель','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
         descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
-        descr_df.to_excel('dfg.xlsx')
 
 
 

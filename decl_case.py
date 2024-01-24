@@ -137,21 +137,32 @@ def create_initials(cell, checkbox, space):
     """
     lst_fio = cell.split(' ')  # сплитим по пробелу
     if len(lst_fio) == 3:  # проверяем на стандартный размер в 3 слова иначе ничего не меняем
+        dct_fio_initials = {'Фамилия': lst_fio[0], 'Имя': lst_fio[1], 'Отчество': lst_fio[2]} # словарь для хранения ицициалов
+        for key, value in dct_fio_initials.items():
+            if '-' not in value:
+                dct_fio_initials[key] = value[0]
+            else:
+                # если есть дефис то сплитим и добавляем в словарь
+                temp = value.split('-')
+                first, second = temp[0], temp[1]
+                dct_fio_initials[key] = f'{first[0]}-{second[0]}'
+
         if checkbox == 'ФИ':
             if space == 'без пробела':
                 # возвращаем строку вида Иванов И.И.
-                return f'{lst_fio[0]} {lst_fio[1][0].upper()}.{lst_fio[2][0].upper()}.'
+
+                return f'{lst_fio[0]} {dct_fio_initials["Имя"].upper()}.{dct_fio_initials["Отчество"].upper()}.'
             else:
                 # возвращаем строку с пробелом после имени Иванов И. И.
-                return f'{lst_fio[0]} {lst_fio[1][0].upper()}. {lst_fio[2][0].upper()}.'
-
+                return f'{lst_fio[0]} {dct_fio_initials["Имя"].upper()}. {dct_fio_initials["Отчество"].upper()}.'
         else:
             if space == 'без пробела':
                 # И.И. Иванов
-                return f'{lst_fio[1][0].upper()}.{lst_fio[2][0].upper()}. {lst_fio[0]}'
+                return f'{dct_fio_initials["Имя"].upper()}.{dct_fio_initials["Отчество"].upper()}. {lst_fio[0]}'
             else:
                 # И. И. Иванов
-                return f'{lst_fio[1][0].upper()}. {lst_fio[2][0].upper()}. {lst_fio[0]}'
+                return  f'{dct_fio_initials["Имя"].upper()}. {dct_fio_initials["Отчество"].upper()}. {lst_fio[0]}'
+
     else:
         return cell
 
