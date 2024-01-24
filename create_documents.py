@@ -160,7 +160,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 
 if __name__ == '__main__':
-    main_data_file = 'data/Таблица для заполнения бланков.xlsx'
+    main_data_file = 'data/Пример заполненный.xlsx'
     main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
