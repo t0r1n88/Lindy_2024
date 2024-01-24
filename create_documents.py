@@ -53,7 +53,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
         # Проверяем наличие колонок
-        desc_check_cols = {'Наименование_программы','Тип_программы','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объем',
+        desc_check_cols = {'Наименование_программы','Тип_программы','Вид_документа','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объем',
                            'Руководитель','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
@@ -115,7 +115,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
         # Создаем файл ФИС-ФРДО Если нет папки или файлов то ничего не создаем
         if os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx') and os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ПО.xlsx'):
-            create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,data_file)
+            create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,descr_df['Вид_документа'].values[0])
         else:
             messagebox.showwarning('Линди Создание документов ДПО,ПО',f'ПРЕДУПРЕЖДЕНИЕ !!!\n В папке {folder_template} не найдена папка ФИС-ФРДО или файлы шаблонов в этой папке.\n'
                                    'В папке ФИС-ФРДО должно быть 2 файла, эти файлы должны иметь название Шаблон ФИС-ФРДО ПО и Шаблон ФИС-ФРДО ДПО.\n'
