@@ -138,6 +138,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             dct_descr[name_column] = descr_df.loc[0,name_column]
 
         generate_docs(dct_descr,data_df,folder_template,result_folder,type_program)
+        print('fds')
 
     except NotNameColumn:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
