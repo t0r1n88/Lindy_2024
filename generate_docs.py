@@ -2,10 +2,7 @@
 Скрипт для генерации документов
 """
 import pandas as pd
-import numpy as np
 import os
-import shutil
-from dateutil.parser import ParserError
 from docxtpl import DocxTemplate
 from docxcompose.composer import Composer
 from docx import Document
@@ -168,6 +165,10 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
         type_dct_program  = {'ДПО':'Дополнительная профессиональная программа','ПО':'Основная програма'}
         dct_descr['Основа_программы'] = type_dct_program[type_program]
 
+        # словарь для типа программы чего
+        type_dct_program_rod  = {'ДПО':'дополнительной профессиональной программы','ПО':'основной программы'}
+        dct_descr['Основа_программы_чего'] = type_dct_program_rod[type_program]
+
 
         # словарь для вида документа в единственном числе
         dct_type_doc_single = {'Удостоверение о повышении квалификации':'удостоверение о повышении квалификации',
@@ -269,6 +270,17 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
     except NotFileSource:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В папке с шаблонами не найдены файлы docx !!!')
+    except exceptions.TemplateSyntaxError:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'Ошибка в оформлении вставляемых значений в шаблоне\n'
+                             f'Проверьте свой шаблон на наличие следующих ошибок:\n'
+                             f'1) Вставляемые значения должны быть оформлены двойными фигурными скобками\n'
+                             f'{{{{Вставляемое_значение}}}}\n'
+                             f'2) В названии колонки в таблице откуда берутся данные - есть пробелы,цифры,знаки пунктуации и т.п.\n'
+                             f'в названии колонки должны быть только буквы и нижнее подчеркивание.\n'
+                             f'{{{{Дата_рождения}}}}')
+
+
 
 
 if __name__ == '__main__':
