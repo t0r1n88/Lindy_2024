@@ -51,7 +51,13 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         if folder_template == result_folder:
             raise SamePathFolder
         # Предобработка датафрейма с данными курса
-        descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,nrows=1)  # получаем данные
+        descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,usecols='A:B')  # получаем данные
+        descr_df.dropna(how='all',inplace=True) # удаляем пустые строки
+        # траснпонируем
+        descr_df = descr_df.transpose()
+        descr_df.columns = descr_df.iloc[0] # устанавливаем первую строку в качестве названий колонок
+        descr_df.drop(labels='Наименование параметра',inplace=True,axis=0) # удаляем первую строку
+        descr_df.index = [0] # переименовываем оставшийся индекс в 0
         # Проверяем наличие колонок
         desc_check_cols = {'Наименование_программы','Тип_программы','Вид_документа','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объем',
                            'Руководитель','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
@@ -158,7 +164,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 
 if __name__ == '__main__':
-    main_data_file = 'data/Пример заполненный.xlsx'
+    main_data_file = 'data/Данные по курсу.xlsx'
     main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
