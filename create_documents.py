@@ -138,8 +138,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             dct_descr[name_column] = descr_df.loc[0,name_column]
 
         generate_docs(dct_descr,data_df,folder_template,result_folder,type_program)
-        print('fds')
-
+        messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
     except NotNameColumn:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В файле {data_file} не найдены следующие колонки {diff_cols}')
@@ -156,8 +155,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
 
-    else:
-        messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
 
 
 if __name__ == '__main__':
