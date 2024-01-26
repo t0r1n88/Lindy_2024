@@ -382,7 +382,7 @@ def declension_fio_by_case(df:pd.DataFrame,result_folder:str)->pd.DataFrame:
                     pass
             adjusted_width = (max_length + 2)
             wb[wb.sheetnames[0]].column_dimensions[column_name].width = adjusted_width
-            wb.save(f'{result_folder}/Проверка правильности склонения ФИО.xlsx')
+            wb.save(f'{result_folder}/Проверка правильности склонения ФИО слушателей.xlsx')
 
 
 

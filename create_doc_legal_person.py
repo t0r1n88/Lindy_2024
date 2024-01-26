@@ -1,8 +1,7 @@
 """
-Скрипт для создания сопроводительной документации
+Скрипт для создания сопроводительной документации для юридических лиц
 Основной скрипт
 """
-from create_fis_frdo import create_fis_frdo # модуль для создания файла фис фрдо
 from decl_case import declension_fio_by_case # функция для склонения фио и создания инициалов
 from decl_case import declension_lst_fio_columns_by_case # функция для склонения колонок с фио из листа описания курса
 from generate_docs import generate_docs # модуль для создания документов
@@ -76,22 +75,41 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         else:
             type_program = 'ПО'
 
+
         # Предобработка датафрейма с данными слушателей
-        data_df = pd.read_excel(data_file, sheet_name='Данные физлиц', dtype=str)  # получаем данные
+        data_df = pd.read_excel(data_file, sheet_name='Данные юрлиц', dtype=str)  # получаем данные
         # Проверяем наличие нужных колонок в файле с данными
-        check_columns_data = {'Номер_удостоверения','Рег_номер','Дата_рождения','Пол','СНИЛС','Гражданство','Уровень_образования'
-            ,'Серия_паспорта','Номер_паспорта','Кем_выдан_паспорт','Дата_выдачи_паспорта'} # проверяемые колонки
+        check_columns_data = {'Заказчик','Организация_заказчика','Должность_заказчика','Должность_заказчика_род_падеж','Количество_слушателей',
+                              'Стоимость_единицы_ЮЛ','Сумма_договора_кр_ЮЛ'
+            ,'Сумма_договора_полн_ЮЛ','Реквизиты_ЮЛ'} # проверяемые колонки
         diff_cols = check_columns_data.difference(set(data_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn  # если есть разница вызываем и обрабатываем исключение
-        # Обрабатываем вариант создаем доп колонки связанные с ФИО
-        data_df = declension_fio_by_case(data_df,result_folder)
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
+
+        descr_fio_cols =['Заказчик'] # список колонок для которых нужно создать падежи и инициалы
+        data_df = declension_lst_fio_columns_by_case(data_df,descr_fio_cols)
+        # сохраняем таблицу для проверки правильности склонения
+        # получаем список колонок сс словом заказчик чтобы лишние колонки не мешались
+        lst_filter = [name_column for name_column in data_df.columns if 'Заказчик' in name_column]
+        wb = openpyxl.Workbook()
+        for row in dataframe_to_rows(data_df[lst_filter],index=False,header=True):
+            wb[wb.sheetnames[0]].append(row)
+        for column in wb[wb.sheetnames[0]].columns:
+            max_length = 0
+            column_name = get_column_letter(column[0].column)
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            wb[wb.sheetnames[0]].column_dimensions[column_name].width = adjusted_width
+            wb.save(f'{result_folder}/Проверка правильности склонения ФИО заказчиков.xlsx')
+
         descr_fio_cols =['Руководитель','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
         descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
-
-
-
 
         """
             Конвертируем даты из формата ГГГГ-ММ-ДД в ДД.ММ.ГГГГ
@@ -120,14 +138,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
                 lst_date_columns_data.append(idx)
         data_df = convert_string_date(data_df,lst_date_columns_data)
 
-        # Создаем файл ФИС-ФРДО Если нет папки или файлов то ничего не создаем
-        if os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx') and os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ПО.xlsx'):
-            create_fis_frdo(data_df,descr_df,folder_template,result_folder,type_program,descr_df['Вид_документа'].values[0])
-        else:
-            messagebox.showwarning('Линди Создание документов ДПО,ПО',f'ПРЕДУПРЕЖДЕНИЕ !!!\n В папке {folder_template} не найдена папка ФИС-ФРДО или файлы шаблонов в этой папке.\n'
-                                   'В папке ФИС-ФРДО должно быть 2 файла, эти файлы должны иметь название Шаблон ФИС-ФРДО ПО и Шаблон ФИС-ФРДО ДПО.\n'
-                                                                'Отсутствие этой папки НЕ ПОВЛИЯЕТ на создание остальных документов.')
-
         # создаем словари с данными для колонок описания программы
 
         # получаем списки валидных названий колонок
@@ -143,7 +153,8 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         dct_descr = dict()
         for name_column in descr_valid_cols:
             dct_descr[name_column] = descr_df.loc[0,name_column]
-        type_form = 'ФЛ'  # указываем физлицо или юрлицо
+
+        type_form = 'ЮЛ' # указываем физлицо или юрлицо
         generate_docs(dct_descr,data_df[data_valid_cols],folder_template,result_folder,type_program,type_form)
         messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
     except NotNameColumn:
@@ -166,7 +177,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
-    main_folder_template = 'data/Шаблоны'
+    main_folder_template = 'data/Шаблоны/Договора/ДПО/ПЛАТНО'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
 
