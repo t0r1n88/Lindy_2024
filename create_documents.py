@@ -73,7 +73,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         descr_df.index = [0] # переименовываем оставшийся индекс в 0
         # Проверяем наличие колонок
         desc_check_cols = {'Наименование_программы','Тип_программы','Вид_документа','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объём',
-                           'Руководитель','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
+                           'Руководитель','Руководитель_подразд','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn
@@ -113,8 +113,11 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         data_df.dropna(how='all',inplace=True) # удаляем пустые строки
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
         data_df = declension_fio_by_case(data_df,result_folder)
+        if 'ФИО_представителя' in data_df.columns:
+            data_df= declension_lst_fio_columns_by_case(data_df,['ФИО_представителя'])
+
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
-        descr_fio_cols =['Руководитель','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
+        descr_fio_cols =['Руководитель','Руководитель_подразд','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
         descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
 
 
@@ -196,6 +199,8 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
+    main_data_file = 'data/Данные по курсу несовершеннолетние.xlsx'
+
     # main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'

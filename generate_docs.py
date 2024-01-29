@@ -119,7 +119,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
     :return: Сопроводительная документация в формате docx
     """
     try:
-        used_name_file = set()  # множество для уже использованных имен файлов
+
         # Словарь для получения длинных выражений по типу программы
         where_type_program = {'Повышение квалификации':'дополнительную профессиональную программу повышения квалификации',
                               'Профессиональная переподготовка':'дополнительную профессиональную программу профессиональной переподготовки',
@@ -201,6 +201,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                 if file.endswith('.docx') and not file.startswith('~$'): # получаем только файлы docx и не временные
                     # определяем тип создаваемого документа
                     if 'раздельный' in file.lower():
+                        used_name_file = set()  # множество для уже использованных имен файлов
                         # Создаем в цикле документы
                         for idx, row in enumerate(data):
                             doc = DocxTemplate(f'{source_folder}/{file}')
@@ -220,10 +221,12 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                                 name_file = f'{type_file} {name_file}'
 
                             # проверяем файл на наличие, если файл с таким названием уже существует то добавляем окончание
+
                             if name_file in used_name_file:
                                 name_file = f'{name_file}_{idx}'
 
                             doc.save(f'{dest_folder}/{name_file[:80]}.docx')
+                            used_name_file.add(name_file[:80]) # добавляем в использованные названия
                     elif 'общий' in file.lower():
                         # Список с созданными файлами
                         files_lst = []
@@ -255,6 +258,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                         # генерируем текущее время
                         t = time.localtime()
                         current_time = time.strftime('%H_%M_%S', t)
+                        used_name_file = set()  # множество для уже использованных имен файлов
                         doc = DocxTemplate(f'{source_folder}/{file}')
                         context = dict()
                         context['Итог'] = lst_data_df.to_dict('records')
@@ -272,6 +276,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                             name_file = f'{name_file}_{idx}'
 
                         doc.save(f'{dest_folder}/{name_file[:80]} {current_time}.docx')
+                        used_name_file.add(name_file[:80])
         if data_df.shape[0] == 0:
             if type_form == 'ФЛ':
                 messagebox.showinfo('Линди Создание документов ДПО,ПО',
