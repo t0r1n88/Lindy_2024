@@ -189,10 +189,6 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
 
         dct_descr['Вид_документа_мн'] = dct_type_doc_mul[dct_descr['Вид_документа']]
 
-
-
-
-
         lst_data_df = data_df.copy() # копируем датафрейм пока он содержит только данные из листа Список
         # добавляем колонки из описания программы в датафрейм данных
         for key, value in dct_descr.items():
@@ -251,9 +247,10 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                                 # Добавляем путь к файлу в список
                                 files_lst.append(f'{tmpdirname}/{name_file[:80]}_{idx}.docx')
                             # Получаем базовый файл
-                            main_doc = files_lst.pop(0)
-                            # Запускаем функцию
-                            combine_all_docx(main_doc, files_lst, dest_folder)
+                            if len(files_lst) != 0: # проверка на заполнение листа с данными
+                                main_doc = files_lst.pop(0)
+                                # Запускаем функцию
+                                combine_all_docx(main_doc, files_lst, dest_folder)
                     else:
                         # генерируем текущее время
                         t = time.localtime()

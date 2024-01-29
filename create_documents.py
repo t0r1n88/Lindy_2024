@@ -39,6 +39,7 @@ class SamePathFolder(Exception):
     """
     pass
 
+
 def create_docs(data_file:str,folder_template:str,result_folder:str):
     """
     Скрипт для сопроводительной документации. Точка входа
@@ -66,6 +67,8 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn
+
+
         descr_df = descr_df.applymap(lambda x:re.sub(r'\s+',' ',x) if isinstance(x,str) else x) # очищаем от лишних пробелов
         descr_df = descr_df.applymap(lambda x:x.strip() if isinstance(x,str) else x) # очищаем от пробелов в начале и конце
 
@@ -84,6 +87,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         diff_cols = check_columns_data.difference(set(data_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn  # если есть разница вызываем и обрабатываем исключение
+        data_df.dropna(how='all',inplace=True) # удаляем пустые строки
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
         data_df = declension_fio_by_case(data_df,result_folder)
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
@@ -166,6 +170,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
+    main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'

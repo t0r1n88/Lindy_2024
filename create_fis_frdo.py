@@ -66,7 +66,7 @@ def write_data_fis_frdo(template_fis_frdo_dpo:openpyxl.Workbook,dct_df:dict,dct_
     dct_descr_df['Дата_начало'][0] = date_begin
     dct_descr_df['Дата_конец'][0] = date_end
     # Делаем числовым срок обучения
-    temp_volume =dct_descr_df['Объём'][0]
+    temp_volume =str(dct_descr_df['Объём'][0])
     if temp_volume.isdigit():
         dct_descr_df['Объём'][0] = int(temp_volume)
     else:
