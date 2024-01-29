@@ -199,8 +199,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
-    main_data_file = 'data/Данные по курсу несовершеннолетние.xlsx'
-
+    # main_data_file = 'data/Данные по курсу несовершеннолетние.xlsx'
     # main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'
