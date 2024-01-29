@@ -38,7 +38,7 @@ class SamePathFolder(Exception):
     """
     pass
 
-def create_docs(data_file:str,folder_template:str,result_folder:str):
+def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str):
     """
     Скрипт для сопроводительной документации. Точка входа
     :param data_file: файл Excel с данными

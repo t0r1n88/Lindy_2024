@@ -1,4 +1,5 @@
 from create_documents import create_docs # импортируем основную функцию генерации документов
+from create_doc_legal_person import create_docs_legal_person # импортируем функцию для генерации документов юрлиц
 from prepare_data import prepare_list # импортируем функцию очистки данных
 import pandas as pd
 from tkinter import *
@@ -159,6 +160,50 @@ def processing_create_docs():
         messagebox.showerror('Создание документов ДПО,ПО',
                              f'Выберите файл с данными и папку куда будет генерироваться файл')
 
+
+"""
+Функции для выбора папок и файлов при генерации документов юрлиц
+"""
+
+def select_file_data_create_docs_legal_person():
+    """
+    Функция для выбора файла xlsx с данными программы
+    :return:
+    """
+    global data_create_docs_legal_person
+    # Получаем путь к файлу
+    data_create_docs_legal_person = filedialog.askopenfilename(filetypes=(('Excel files', '*.xlsx'), ('all files', '*.*')))
+
+
+def select_template_folder_legal_person():
+    """
+    Функия для выбора папки с шаблонами документов
+    :return:
+    """
+    global template_folder_legal_person
+    template_folder_legal_person = filedialog.askdirectory()
+
+def select_result_folder_legal_person():
+    """
+    Функия для выбора папки с шаблонами документов
+    :return:
+    """
+    global result_folder_legal_person
+    result_folder_legal_person = filedialog.askdirectory()
+
+
+def processing_create_docs_legal_person():
+    """
+    Функция для запуска создания документов
+    :return: Документы в конечной папке
+    """
+    try:
+        create_docs_legal_person(data_create_docs_legal_person,template_folder_legal_person,result_folder_legal_person)
+    except NameError:
+        messagebox.showerror('Создание документов ДПО,ПО',
+                             f'Выберите файл с данными и папку куда будет генерироваться файл')
+
+
 """
 Функции для вкладки подготовка файлов
 """
@@ -261,6 +306,57 @@ if __name__ == '__main__':
     btn_process_create_docs = Button(tab_create_docs,text='4) Создать документы', font=('Arial Bold', 14),
                                         command=processing_create_docs)
     btn_process_create_docs.pack(padx=10, pady=10)
+
+    """
+    Создаем вкладку для генерации документов юрлиц
+    """
+
+    tab_create_docs_legal_person = ttk.Frame(tab_control)
+    tab_control.add(tab_create_docs_legal_person, text='Создание документов ДПО и ПО для юрлиц')
+
+    create_docs_legal_person_frame_description = LabelFrame(tab_create_docs_legal_person)
+    create_docs_legal_person_frame_description.pack()
+
+    lbl_hello_create_docs_legal_person = Label(create_docs_legal_person_frame_description,
+                                               text='Центр опережающей профессиональной подготовки Республики Бурятия\n'
+                                                    'Создание сопроводительной документации к программам ДПО и ПО для юрлиц\n',
+                                               width=60)
+    lbl_hello_create_docs_legal_person.pack(side=LEFT, anchor=N, ipadx=25, ipady=10)
+
+    # Картинка
+    path_to_img_create_docs_legal_person = resource_path('logo.png')
+    img_create_docs_legal_person = PhotoImage(file=path_to_img_create_docs_legal_person)
+    Label(create_docs_legal_person_frame_description,
+          image=img_create_docs_legal_person, padx=10, pady=10
+          ).pack(side=LEFT, anchor=E, ipadx=5, ipady=5)
+
+    # Создаем область для того чтобы поместить туда подготовительные кнопки(выбрать файл,выбрать папку и т.п.)
+    frame_data_create_docs_legal_person = LabelFrame(tab_create_docs_legal_person, text='Подготовка')
+    frame_data_create_docs_legal_person.pack(padx=10, pady=10)
+
+    # Создаем кнопку выбора файла с данными
+    btn_choose_create_docs_legal_person_file = Button(frame_data_create_docs_legal_person, text='1) Выберите файл',
+                                                      font=('Arial Bold', 14),
+                                                      command=select_file_data_create_docs_legal_person)
+    btn_choose_create_docs_legal_person_file.pack(padx=10, pady=10)
+
+    # Создаем кнопку выбора конечной папки
+    btn_choose_template_folder_legal_person = Button(frame_data_create_docs_legal_person, text='2) Выберите папку с шаблонами',
+                                        font=('Arial Bold', 14),
+                                        command=select_template_folder_legal_person)
+    btn_choose_template_folder_legal_person.pack(padx=10, pady=10)
+
+    # Создаем кнопку выбора конечной папки
+    btn_choose_result_folder_legal_person = Button(frame_data_create_docs_legal_person, text='3) Выберите конечную папку',
+                                      font=('Arial Bold', 14),
+                                      command=select_result_folder_legal_person)
+    btn_choose_result_folder_legal_person.pack(padx=10, pady=10)
+
+    # Создаем кнопку генерации документов
+    btn_process_create_docs_legal_person = Button(tab_create_docs_legal_person, text='4) Создать документы',
+                                                  font=('Arial Bold', 14),
+                                                  command=processing_create_docs_legal_person)
+    btn_process_create_docs_legal_person.pack(padx=10, pady=10)
 
     """
        Создаем вкладку для предварительной обработки списка
