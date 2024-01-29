@@ -272,6 +272,15 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                             name_file = f'{name_file}_{idx}'
 
                         doc.save(f'{dest_folder}/{name_file[:80]} {current_time}.docx')
+        if data_df.shape[0] == 0:
+            if type_form == 'ФЛ':
+                messagebox.showinfo('Линди Создание документов ДПО,ПО',
+                                    'Не заполнен лист Данные физлиц. \n'
+                                    'В созданных документах соответствующие метки не заполнены.')
+            else:
+                messagebox.showinfo('Линди Создание документов ДПО,ПО',
+                                    'Не заполнен лист Данные юрлицц. \n'
+                                    'В созданных документах соответствующие метки не заполнены.')
     except NotFileSource:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В папке с шаблонами не найдены файлы docx !!!')

@@ -2,6 +2,9 @@
 Скрипт для создания сопроводительной документации
 Основной скрипт
 """
+import numpy
+import numpy as np
+
 from create_fis_frdo import create_fis_frdo # модуль для создания файла фис фрдо
 from decl_case import declension_fio_by_case # функция для склонения фио и создания инициалов
 from decl_case import declension_lst_fio_columns_by_case # функция для склонения колонок с фио из листа описания курса
@@ -38,6 +41,13 @@ class SamePathFolder(Exception):
     Исключение для случая когда одна и та же папка выбрана в качестве источника и конечной папки
     """
     pass
+
+class NotFillMainValue(Exception):
+    """
+    Исключение для проверки заполнения 3 главных параметров: Наименование_программы, Тип_программы, Вид_документа
+    """
+    pass
+
 
 
 def create_docs(data_file:str,folder_template:str,result_folder:str):
@@ -78,6 +88,19 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             type_program = 'ДПО'
         else:
             type_program = 'ПО'
+
+        lst_check_fill_main_value = list(descr_df.iloc[0,:3])
+        if pd.isnull(lst_check_fill_main_value).any():
+            raise NotFillMainValue
+
+
+
+
+
+
+
+
+
 
         # Предобработка датафрейма с данными слушателей
         data_df = pd.read_excel(data_file, sheet_name='Данные физлиц', dtype=str)  # получаем данные
@@ -162,6 +185,9 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Выбрана одна и та же папка в качесте исходной и конечной.\n'
                              f'Исходная и конечная папки должны быть разными !!!')
+    except NotFillMainValue:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'Заполните значения: Наименование_программы,Тип_программы,\nВид_документа !')
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
@@ -170,7 +196,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
-    main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
+    # main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
