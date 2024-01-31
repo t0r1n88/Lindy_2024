@@ -110,7 +110,6 @@ def create_fis_frdo(df:pd.DataFrame,descr_df:pd.DataFrame,folder_template:str,re
     current_time = time.strftime('%H_%M_%S', t)
     try:
         if type_program == 'ДПО':
-
             dct_df = df.to_dict(orient='list') # превращаем в словарь где ключ это название колонки а значение это список
             dct_descr_df = descr_df.to_dict(orient='list')
             # Создаем словарь для хранения номеров колонок для каждого названия

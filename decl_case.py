@@ -31,6 +31,12 @@ class NotFIOPart(Exception):
     """
     pass
 
+class FIOTogether(Exception):
+    """
+    исключение для проверки одновременного наличия колонок ФИО и колонок Фамилия,Имя,Отчество
+    """
+    pass
+
 
 
 def capitalize_double_name(word):
@@ -272,6 +278,9 @@ def declension_fio_by_case(df:pd.DataFrame,result_folder:str)->pd.DataFrame:
     try:
 
         temp_df = pd.DataFrame()  # временный датафрейм для хранения колонок просклоненных по падежам
+        # проверям одновременное наличие колонок ФИО и Фамилия,Имя,Отчество
+        if {'ФИО','Фамилия','Имя','Отчество'}.issubset(set(df.columns)):
+            raise FIOTogether
         # проверяем наличие колонки ФИО
         if 'ФИО' in df.columns:
             fio_column = 'ФИО'

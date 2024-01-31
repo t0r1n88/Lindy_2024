@@ -93,15 +93,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         if pd.isnull(lst_check_fill_main_value).any():
             raise NotFillMainValue
 
-
-
-
-
-
-
-
-
-
         # Предобработка датафрейма с данными слушателей
         data_df = pd.read_excel(data_file, sheet_name='Данные физлиц', dtype=str)  # получаем данные
         # Проверяем наличие нужных колонок в файле с данными
@@ -113,7 +104,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Обрабатываем вариант создаем доп колонки связанные с ФИО
         data_df = declension_fio_by_case(data_df,result_folder)
         if 'ФИО_представителя' in data_df.columns:
-            data_df= declension_lst_fio_columns_by_case(data_df,['ФИО_представителя'])
+            data_df = declension_lst_fio_columns_by_case(data_df,['ФИО_представителя'])
 
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
         descr_fio_cols =['Руководитель','Руководитель_подразд','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
@@ -198,6 +189,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
+    main_data_file = 'data/Данные по курсу Базовый вариант.xlsx'
     # main_data_file = 'data/Данные по курсу несовершеннолетние.xlsx'
     # main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
