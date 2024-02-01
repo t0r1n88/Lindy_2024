@@ -451,6 +451,10 @@ def declension_fio_by_case(df:pd.DataFrame,result_folder:str)->pd.DataFrame:
     except NotFIOPart:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Не найдены колонки Фамилия,Имя,Отчество!')
+    except FIOTogether:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'На листе Данные физлиц одновременно находятся колонки ФИО, Фамилия,Имя, Отчество.\n'
+                             f'Удалите колонку ФИО или колонки Фамилия,Имя,Отчество')
     except KeyError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В таблице не найдена указанная колонка {e.args}')
