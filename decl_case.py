@@ -279,6 +279,7 @@ def declension_fio_by_case(df:pd.DataFrame,result_folder:str)->pd.DataFrame:
 
         temp_df = pd.DataFrame()  # временный датафрейм для хранения колонок просклоненных по падежам
         # проверям одновременное наличие колонок ФИО и Фамилия,Имя,Отчество
+
         if {'ФИО','Фамилия','Имя','Отчество'}.issubset(set(df.columns)):
             raise FIOTogether
         # проверяем наличие колонки ФИО
