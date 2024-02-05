@@ -189,10 +189,10 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
 
         dct_descr['Вид_документа_мн'] = dct_type_doc_mul[dct_descr['Вид_документа']]
 
-        lst_data_df = data_df.copy() # копируем датафрейм пока он содержит только данные из листа Список
         # добавляем колонки из описания программы в датафрейм данных
         for key, value in dct_descr.items():
             data_df[key] = value
+        lst_data_df = data_df.copy()  # копируем датафрейм
         # Конвертируем датафрейм в список словарей
         data = data_df.to_dict('records')
         dct_path = copy_folder_structure(source_folder,destination_folder) # копируем структуру папок
