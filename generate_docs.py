@@ -163,7 +163,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
 
 
         # словарь для типа программы
-        type_dct_program  = {'ДПО':'Дополнительная профессиональная программа','ПО':'Основная програма'}
+        type_dct_program  = {'ДПО':'Дополнительная профессиональная программа','ПО':'Основная программа'}
         dct_descr['Основа_программы'] = type_dct_program[type_program]
 
         # словарь для типа программы чего
