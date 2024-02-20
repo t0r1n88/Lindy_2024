@@ -242,11 +242,10 @@ def processing_preparation_file():
 
 if __name__ == '__main__':
     window = Tk()
-    window.title('Линди Создание документов ДПО,ПО ver 2.0')
+    window.title('Линди Создание документов ДПО,ПО ver 2.1')
     # Устанавливаем размер и положение окна
     set_window_size(window)
-    # window.geometry('774x760')
-    # window.geometry('980x910+700+100')
+
     window.resizable(True, True)
     # Добавляем контекстное меню в поля ввода
     make_textmenu(window)
