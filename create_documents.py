@@ -132,7 +132,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
                 lst_date_columns_descr.append(idx)
 
         descr_df = convert_string_date(descr_df,lst_date_columns_descr)
-
         # обрабатываем колонки с датами в списке
         lst_date_columns_data = []  # список для колонок с датами
         for idx, column in enumerate(data_df.columns):
@@ -189,10 +188,12 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
+    main_data_file = 'data/Инга Курс.xlsx'
     # main_data_file = 'data/Данные по курсу Базовый вариант.xlsx'
     # main_data_file = 'data/Данные по курсу несовершеннолетние.xlsx'
     # main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
+    main_folder_template = 'data/Шаблоны/Согласия'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
 

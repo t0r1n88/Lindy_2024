@@ -42,11 +42,14 @@ def convert_string_date(df:pd.DataFrame,lst_date_columns:list)->pd.DataFrame:
     :param lst_date_columns: список с индексами колонок с датами
     :return: исправленный датафрейм
     """
+    lst_name_columns = [] # список куда будут сохраняться названия колонок
+    for i in lst_date_columns:
+        lst_name_columns.append(list(df.columns)[i])
 
     # Конвертируем в пригодный строковый формат
-    for i in lst_date_columns:
-        df.iloc[:, i] = pd.to_datetime(df.iloc[:, i], errors='coerce', dayfirst=True)
-        df.iloc[:, i] = df.iloc[:, i].apply(create_doc_convert_date)
+    for name_column in lst_name_columns:
+        df[name_column] = pd.to_datetime(df[name_column],errors='coerce')
+        df[name_column] =  df[name_column].apply(create_doc_convert_date)
 
 
     return df
