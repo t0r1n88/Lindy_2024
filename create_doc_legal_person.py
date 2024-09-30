@@ -7,6 +7,7 @@ from decl_case import declension_lst_fio_columns_by_case # функция для
 from generate_docs import generate_docs # модуль для создания документов
 from support_functions import * # вспомогательные функции
 import pandas as pd
+import numpy as np
 import openpyxl
 from tkinter import messagebox
 import os
