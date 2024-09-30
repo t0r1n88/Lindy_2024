@@ -2,7 +2,6 @@
 Скрипт для создания сопроводительной документации для юридических лиц
 Основной скрипт
 """
-from decl_case import declension_fio_by_case # функция для склонения фио и создания инициалов
 from decl_case import declension_lst_fio_columns_by_case # функция для склонения колонок с фио из листа описания курса
 from generate_docs import generate_docs # модуль для создания документов
 from support_functions import * # вспомогательные функции
@@ -205,8 +204,7 @@ def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
-    else:
-        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Создание документов успешно завершено !')
+
 
 
 

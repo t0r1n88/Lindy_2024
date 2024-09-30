@@ -12,6 +12,7 @@ from jinja2 import exceptions
 import time
 import datetime
 import warnings
+import pdb
 
 warnings.filterwarnings('ignore', category=UserWarning, module='openpyxl')
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
@@ -277,6 +278,7 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
 
                         doc.save(f'{dest_folder}/{name_file[:80]} {current_time}.docx')
                         used_name_file.add(name_file[:80])
+
         if data_df.shape[0] == 0:
             if type_form == 'ФЛ':
                 messagebox.showinfo('Линди Создание документов ДПО,ПО',
@@ -298,6 +300,8 @@ def generate_docs(dct_descr:dict,data_df:pd.DataFrame,source_folder:str,destinat
                              f'2) В названии колонки в таблице откуда берутся данные - есть пробелы,цифры,знаки пунктуации и т.п.\n'
                              f'в названии колонки должны быть только буквы и нижнее подчеркивание.\n'
                              f'{{{{Дата_рождения}}}}')
+    else:
+        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Создание документов успешно завершено !')
 
 
 
@@ -473,6 +477,8 @@ def generate_docs_legal_person(dct_descr:dict,data_df:pd.DataFrame,source_folder
                              f'2) В названии колонки в таблице откуда берутся данные - есть пробелы,цифры,знаки пунктуации и т.п.\n'
                              f'в названии колонки должны быть только буквы и нижнее подчеркивание.\n'
                              f'{{{{Дата_рождения}}}}')
+    else:
+        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Создание документов успешно завершено !')
 
 
 

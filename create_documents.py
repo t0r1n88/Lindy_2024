@@ -2,9 +2,7 @@
 Скрипт для создания сопроводительной документации
 Основной скрипт
 """
-import numpy
 import numpy as np
-
 from create_fis_frdo import create_fis_frdo # модуль для создания файла фис фрдо
 from decl_case import declension_fio_by_case # функция для склонения фио и создания инициалов
 from decl_case import declension_lst_fio_columns_by_case # функция для склонения колонок с фио из листа описания курса
@@ -165,7 +163,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
                 lst_date_columns_data.append(idx)
         data_df = convert_string_date(data_df,lst_date_columns_data)
 
-        # Обрабатываем колонку с СНИЛС, превращая в формат для ФИС-ФРДО
+        # Обрабатываем колонку с СНИЛС
         data_df['СНИЛС'] = data_df['СНИЛС'].apply(check_snils)
 
         # Создаем файл ФИС-ФРДО Если нет папки или файлов то ничего не создаем
@@ -214,8 +212,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
-    else:
-        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Создание документов успешно завершено !')
 
 
 
