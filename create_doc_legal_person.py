@@ -43,7 +43,24 @@ class NotReqSheet(Exception):
     Исключение для проверки наличия трех листов: Описание, Данные физлиц, Данные юрлиц
     """
     pass
+def check_snils(snils):
+    """
+    Функция для приведения значений снилс в вид ХХХ-ХХХ-ХХХ ХХ
+    """
+    if snils is np.nan:
+        return 'Не заполнено'
+    snils = str(snils)
+    result = re.findall(r'\d', snils) # ищем цифры
+    if len(result) == 11:
+        first_group = ''.join(result[:3])
+        second_group = ''.join(result[3:6])
+        third_group = ''.join(result[6:9])
+        four_group = ''.join(result[9:11])
 
+        out_snils = f'{first_group}-{second_group}-{third_group} {four_group}'
+        return out_snils
+    else:
+        return f'Неправильное значение!В СНИЛС физического лица должно быть 11 цифр - {snils} -{len(snils)} цифр'
 
 def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str):
     """
