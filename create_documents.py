@@ -54,6 +54,25 @@ class NotReqSheet(Exception):
     """
     pass
 
+def check_snils(snils):
+    """
+    Функция для приведения значений снилс в вид ХХХ-ХХХ-ХХХ ХХ
+    """
+    if snils is np.nan:
+        return 'Не заполнено'
+    snils = str(snils)
+    result = re.findall(r'\d', snils) # ищем цифры
+    if len(result) == 11:
+        first_group = ''.join(result[:3])
+        second_group = ''.join(result[3:6])
+        third_group = ''.join(result[6:9])
+        four_group = ''.join(result[9:11])
+
+        out_snils = f'{first_group}-{second_group}-{third_group} {four_group}'
+        return out_snils
+    else:
+        return f'Неправильное значение!В СНИЛС физического лица должно быть 11 цифр - {snils} -{len(snils)} цифр'
+
 def create_docs(data_file:str,folder_template:str,result_folder:str):
     """
     Скрипт для сопроводительной документации. Точка входа
@@ -145,6 +164,9 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             if 'дата' in column.lower():
                 lst_date_columns_data.append(idx)
         data_df = convert_string_date(data_df,lst_date_columns_data)
+
+        # Обрабатываем колонку с СНИЛС, превращая в формат для ФИС-ФРДО
+        data_df['СНИЛС'] = data_df['СНИЛС'].apply(check_snils)
 
         # Создаем файл ФИС-ФРДО Если нет папки или файлов то ничего не создаем
         if os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ДПО.xlsx') and os.path.exists(f'{folder_template}/ФИС-ФРДО/Шаблон ФИС-ФРДО ПО.xlsx'):
