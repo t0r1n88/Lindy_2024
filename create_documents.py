@@ -48,7 +48,11 @@ class NotFillMainValue(Exception):
     """
     pass
 
-
+class NotReqSheet(Exception):
+    """
+    Исключение для проверки наличия трех листов: Описание, Данные физлиц, Данные юрлиц
+    """
+    pass
 
 def create_docs(data_file:str,folder_template:str,result_folder:str):
     """
@@ -62,18 +66,24 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         if folder_template == result_folder:
             raise SamePathFolder
 
+        # Проверяем наличие листов
+        required_sheets = {'Описание','Данные физлиц','Данные юрлиц'}
+        req_wb = openpyxl.load_workbook(data_file) # загружаем файл для выяснения состава листов
+        diff_sheets = required_sheets.difference(set(req_wb.sheetnames))
+        if len(diff_sheets) != 0:
+            raise NotReqSheet
 
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,usecols='A:B')  # получаем данные
         descr_df.dropna(how='all',inplace=True) # удаляем пустые строки
-        # траснпонируем
+        # транспонируем
         descr_df = descr_df.transpose()
         descr_df.columns = descr_df.iloc[0] # устанавливаем первую строку в качестве названий колонок
         descr_df.drop(labels='Наименование параметра',inplace=True,axis=0) # удаляем первую строку
         descr_df.index = [0] # переименовываем оставшийся индекс в 0
         # Проверяем наличие колонок
         desc_check_cols = {'Наименование_программы','Тип_программы','Вид_документа','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объём',
-                           'Руководитель','Руководитель_подразд','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
+                           'Руководитель','Руководитель_подразд','Секретарь','Преподаватель','Куратор','База','Председатель_АК','Аттестация','Председатель_АК'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn
@@ -88,7 +98,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             type_program = 'ДПО'
         else:
             type_program = 'ПО'
-
+        # Проверяем заполнение строк Наименование_программы, Тип_программы, Вид_документа
         lst_check_fill_main_value = list(descr_df.iloc[0,:3])
         if pd.isnull(lst_check_fill_main_value).any():
             raise NotFillMainValue
@@ -109,9 +119,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # Обрабатываем колонки из датафрейма с описанием курса склоняя по падежам и создавая иницииалы
         descr_fio_cols =['Руководитель','Руководитель_подразд','Секретарь','Преподаватель','Куратор','Председатель_АК'] # список колонок для которых нужно создать падежи и инициалы
         descr_df = declension_lst_fio_columns_by_case(descr_df,descr_fio_cols)
-
-
-
 
         """
             Конвертируем даты из формата ГГГГ-ММ-ДД в ДД.ММ.ГГГГ
@@ -152,7 +159,6 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
         # получаем списки валидных названий колонок
         descr_valid_cols,descr_not_valid_cols = selection_name_column(list(descr_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
         data_valid_cols, data_not_valid_cols = selection_name_column(list(data_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
-        # TODO файл с ошибками и предупреждениями
 
         # заполняем наны пробелами
         descr_df.fillna(' ',inplace=True)
@@ -180,12 +186,13 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
     except NotFillMainValue:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Заполните значения: Наименование_программы,Тип_программы,\nВид_документа !')
+    except NotReqSheet:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'В файле с данными курса не найдены обязательные листы {diff_sheets}')
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
-    else:
-        messagebox.showerror('Линди Создание документов ДПО,ПО',
-                             f'Создание документов успешно завершено')
+
 
 
 
