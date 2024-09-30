@@ -38,6 +38,13 @@ class SamePathFolder(Exception):
     """
     pass
 
+class NotReqSheet(Exception):
+    """
+    Исключение для проверки наличия трех листов: Описание, Данные физлиц, Данные юрлиц
+    """
+    pass
+
+
 def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str):
     """
     Скрипт для сопроводительной документации. Точка входа
@@ -50,6 +57,13 @@ def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str
         if folder_template == result_folder:
             raise SamePathFolder
 
+        # Проверяем наличие листов
+        required_sheets = {'Описание','Данные физлиц','Данные юрлиц'}
+        req_wb = openpyxl.load_workbook(data_file) # загружаем файл для выяснения состава листов
+        diff_sheets = required_sheets.difference(set(req_wb.sheetnames))
+        if len(diff_sheets) != 0:
+            raise NotReqSheet
+
 
         # Предобработка датафрейма с данными курса
         descr_df = pd.read_excel(data_file, sheet_name='Описание', dtype=str,usecols='A:B')  # получаем данные
@@ -61,7 +75,7 @@ def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str
         descr_df.index = [0] # переименовываем оставшийся индекс в 0
         # Проверяем наличие колонок
         desc_check_cols = {'Наименование_программы','Тип_программы','Вид_документа','Квалификация_профессия_специальность','Разряд_класс','Разряд_класс_текст','Дата_начало','Дата_конец','Объём',
-                           'Руководитель','Секретарь','Преподаватель','Куратор','База','Председатель_АК'}
+                           'Руководитель','Секретарь','Преподаватель','Куратор','База','Аттестация','Председатель_АК'}
         diff_cols = desc_check_cols.difference(set(descr_df.columns))
         if len(diff_cols) != 0:
             raise NotNameColumn
@@ -143,7 +157,6 @@ def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str
         # получаем списки валидных названий колонок
         descr_valid_cols,descr_not_valid_cols = selection_name_column(list(descr_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
         data_valid_cols, data_not_valid_cols = selection_name_column(list(data_df.columns),r'^[a-zA-ZЁёа-яА-Я_]+$')
-        # TODO файл с ошибками и предупреждениями
 
         # заполняем наны пробелами
         descr_df.fillna(' ',inplace=True)
@@ -156,7 +169,6 @@ def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str
 
         type_form = 'ЮЛ' # указываем физлицо или юрлицо
         generate_docs(dct_descr,data_df[data_valid_cols],folder_template,result_folder,type_program,type_form)
-        messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
     except NotNameColumn:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В файле {data_file} не найдены следующие колонки {diff_cols}')
@@ -169,17 +181,22 @@ def create_docs_legal_person(data_file:str,folder_template:str,result_folder:str
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Выбрана одна и та же папка в качесте исходной и конечной.\n'
                              f'Исходная и конечная папки должны быть разными !!!')
+    except NotReqSheet:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'В файле с данными курса не найдены обязательные листы {diff_sheets}')
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
+    else:
+        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Создание документов успешно завершено !')
 
 
 
 if __name__ == '__main__':
-    main_data_file = 'data/Данные по курсу.xlsx'
-    main_folder_template = 'data/Шаблоны/Договора/ДПО/ПЛАТНО'
+    main_data_file = 'data/Организация ключевых процессов для повышения эффективности.xlsx'
+    main_folder_template = 'data/Шаблоны'
     # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
 
-    create_docs(main_data_file,main_folder_template,main_result_folder)
+    create_docs_legal_person(main_data_file,main_folder_template,main_result_folder)
     print('Lindy Booth !!!')

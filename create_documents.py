@@ -170,7 +170,7 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
             dct_descr[name_column] = descr_df.loc[0,name_column]
         type_form = 'ФЛ'  # указываем физлицо или юрлицо
         generate_docs(dct_descr,data_df[data_valid_cols],folder_template,result_folder,type_program,type_form)
-        messagebox.showinfo('Линди Создание документов ДПО,ПО','Создание документов успешно завершено !')
+
     except NotNameColumn:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'В файле {data_file} не найдены следующие колонки {diff_cols}')
@@ -192,6 +192,9 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
+    else:
+        messagebox.showinfo('Линди Создание документов ДПО,ПО', 'Создание документов успешно завершено !')
+
 
 
 
