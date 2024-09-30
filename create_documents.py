@@ -183,18 +183,19 @@ def create_docs(data_file:str,folder_template:str,result_folder:str):
     except PermissionError as e:
         messagebox.showerror('Линди Создание документов ДПО,ПО',
                              f'Закройте файлы созданные программой')
+    else:
+        messagebox.showerror('Линди Создание документов ДПО,ПО',
+                             f'Создание документов успешно завершено')
 
 
 
 if __name__ == '__main__':
     main_data_file = 'data/Данные по курсу.xlsx'
-    main_data_file = 'data/Инга Курс.xlsx'
+    main_data_file = 'data/Организация ключевых процессов для повышения эффективности.xlsx'
     # main_data_file = 'data/Данные по курсу Базовый вариант.xlsx'
     # main_data_file = 'data/Данные по курсу несовершеннолетние.xlsx'
     # main_data_file = 'data/Пустая таблица для заполнения курсов.xlsx'
     main_folder_template = 'data/Шаблоны'
-    main_folder_template = 'data/Шаблоны/Согласия'
-    # main_folder_template = 'data/Шаблоны/empty'
     main_result_folder = 'data/Результат'
 
     create_docs(main_data_file,main_folder_template,main_result_folder)
