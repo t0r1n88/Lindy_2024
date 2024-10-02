@@ -242,7 +242,7 @@ def processing_preparation_file():
 
 if __name__ == '__main__':
     window = Tk()
-    window.title('Линди Создание документов ДПО,ПО ver 2.1')
+    window.title('Линди Создание документов ДПО,ПО ver 2.2')
     # Устанавливаем размер и положение окна
     set_window_size(window)
 
